@@ -1,0 +1,12 @@
+[submodule "include/glm"]
+	path = include/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "include/assimp"]
+	path = include/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "include/nanogui"]
+	path = include/nanogui
+	url = https://github.com/wjakob/nanogui.git
+[submodule "include/stb"]
+	path = include/stb
+	url = https://github.com/nothings/stb.git
