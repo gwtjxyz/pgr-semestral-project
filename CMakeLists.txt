@@ -28,7 +28,7 @@ add_definitions(${NANOGUI_EXTRA_DEFS})
 include_directories(${NANOGUI_EXTRA_INCS})
 
 # Compile a target using NanoGUI
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/callback.cpp src/utils.cpp)
 
 # Lastly, additional libraries may have been built for you.  In addition to linking
 # against NanoGUI, we need to link against those as well.
@@ -40,7 +40,7 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 add_subdirectory(include/assimp)
 add_subdirectory(include/glm)
 
-include_directories(include/stb)
+include_directories(include/stb src)
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC include/assimp/include
