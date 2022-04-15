@@ -43,8 +43,8 @@ bool init() {
 
 // loads shaders from files and links them into the program
 void loadShaders() {
-    vertexShader = createShader(GL_VERTEX_SHADER, R"(..\src\shaders\vertexShaderSource.vert)");
-    fragmentShader = createShader(GL_FRAGMENT_SHADER, R"(..\src\shaders\fragmentShaderSource.frag)");
+    vertexShader = createShader(GL_VERTEX_SHADER, R"(..\shaders\vertexShaderSource.vert)");
+    fragmentShader = createShader(GL_FRAGMENT_SHADER, R"(..\shaders\fragmentShaderSource.frag)");
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
