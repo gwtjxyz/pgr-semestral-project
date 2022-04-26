@@ -55,7 +55,7 @@ GLuint compileShader(GLenum shaderType, const char * filePath) {
 // helper function for linking compiled shader
 // assumes the shader has been compiled prior to calling this function
 // and that the shader program ID has been initialized
-void linkShader(GLuint shaderId) {
+GLuint linkShader(GLuint shaderId) {
     if (!gl::programId) {
         std::cerr << "ERROR attempting to link shader ID " << shaderId << " before creating OpenGL program.\n" <<
         "Make sure you've initialized the program with a glCreateProgram() call before using this function.\n";
@@ -77,9 +77,10 @@ void linkShader(GLuint shaderId) {
     }
 
     glDeleteShader(shaderId);
+    return shaderId;
 }
 
 // combines compileShader() and linkShader() together
-void createShader(GLenum shaderType, const char * filePath) {
-    linkShader(compileShader(shaderType, filePath));
+GLuint createShader(GLenum shaderType, const char * filePath) {
+    return linkShader(compileShader(shaderType, filePath));
 }

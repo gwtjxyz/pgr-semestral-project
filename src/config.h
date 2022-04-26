@@ -9,6 +9,7 @@
 namespace Constants {
     const int WINDOW_WIDTH = 800;
     const int WINDOW_HEIGHT = 600;
+    const int ENABLE_DEBUG = 1;
 }
 
 // namespace storing rendering-related variables

@@ -9,6 +9,6 @@ std::string loadShaderFromFile(const char * filePath);
 
 GLuint compileShader(GLenum shaderType, const char * filePath);
 
-void linkShader(GLuint shaderId);
+GLuint linkShader(GLuint shaderId);
 
-void createShader(GLenum shaderType, const char * filePath);
+GLuint createShader(GLenum shaderType, const char * filePath);

@@ -36,3 +36,14 @@ bool init() {
     gl::programId = glCreateProgram();
     return true;
 }
+
+void framebufferSizeCallback(GLFWwindow * window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow * window) {
+    // TODO add shader reload functionality
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+

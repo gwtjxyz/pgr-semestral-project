@@ -7,12 +7,6 @@
 
 bool init();
 
-inline void framebufferSizeCallback(GLFWwindow * window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
+void framebufferSizeCallback(GLFWwindow * window, int width, int height);
 
-inline void processInput(GLFWwindow * window) {
-    // TODO add shader reload functionality
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
+void processInput(GLFWwindow * window);

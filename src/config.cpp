@@ -11,6 +11,9 @@
 //----------------------------------------------------------------------------------------
 #include "config.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 namespace gl {
     GLuint programId = 0;
     GLFWwindow * mainWindow = nullptr;
