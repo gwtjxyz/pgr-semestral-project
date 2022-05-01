@@ -6,19 +6,27 @@
  * \date       18/04/2022
  * \brief      render functions header
  *
- *  Contains several OpenGL rendering-related functions
+ *  Contains several OpenGL rendering-related classes and functions
  *
 */
 //----------------------------------------------------------------------------------------
 
-#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-// Loads and binds texture from specified file.
-// Uses GL_REPEAT, RGB and linear mipmapping by default.
-// TODO make overloaded versions of this function to change default params
-GLuint loadTexture2D(const char * path);
+#include "config.h"
 
-// Loads and binds texture from specified file.
-// The texture format is set manually by the user.
-// Uses GL_REPEAT, linear mipmapping by default.
-GLuint loadTexture2D(const char * path, GLenum format);
+struct Object {
+
+};
+
+namespace Render {
+    // model - transforms object space to world space
+
+
+    // view - transforms world space to camera space
+
+
+    // projection - transforms camera space to clip space
+    glm::mat4 projection();
+}
