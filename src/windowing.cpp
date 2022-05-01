@@ -65,7 +65,7 @@ void processInput(GLFWwindow * window) {
         program.activeCamera.processKeyboard(CameraDirections::RIGHT, gl::deltaTime);
 
     if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        std::cout << "Camera values:\tYaw = " << program.activeCamera.mYaw << " |\tPitch = " << program.activeCamera.mPitch << "\n";
+        std::cout << "Camera values:\tYaw = " << program.activeCamera.mYaw << " |\tPitch = " << program.activeCamera.mPitch << std::endl;
 }
 
 void mouseCallback(GLFWwindow * window, double xPosIn, double yPosIn) {
