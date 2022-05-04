@@ -1,7 +1,10 @@
 #pragma once
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include <map>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include "objects/materials.h"
 
 // TODO add fancy description
 
@@ -42,4 +45,5 @@ namespace gl {
     extern bool firstMouse;
     extern float lastX;
     extern float lastY;
+    extern std::map<MaterialType, Material> materials;
 }

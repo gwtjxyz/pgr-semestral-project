@@ -16,10 +16,9 @@ void loadMainShaders() {
     setActiveProgram(gl::programId);
     createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderSource.vert)");
     createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderSource.frag)");
-
 }
 
-void loadLightingShaders() {
+void loadLightSourceShaders() {
     setActiveProgram(gl::lightingId);
     createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderLightSrc.vert)");
     createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderLightSrc.frag)");
@@ -97,6 +96,12 @@ int main() {
     // load shaderinos
     loadMainShaders();
 
+    setActiveProgram(gl::programId);
+    setUniform3f("material.ambient", 1.0f, 0.5f, 0.31f);
+    setUniform3f("material.diffuse", 1.0f, 0.5f, 0.31f);
+    setUniform3f("material.specular", 0.5f, 0.5f, 0.5f);
+    setUniform1f("material.shininess", 32.0f);
+
     GLuint VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -116,9 +121,8 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-
     // lighting - light source creation
-    loadLightingShaders();
+    loadLightSourceShaders();
 
     GLuint lightVAO;
     glGenVertexArrays(1, &lightVAO);
@@ -165,27 +169,32 @@ int main() {
 
         // render light
         setActiveProgram(gl::lightingId);
-        glUseProgram(program.activeId);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f));
         PVM = proj * view * model;
 
-        int pvmLoc = glGetUniformLocation(program.activeId, "PVM");
-        glUniformMatrix4fv(pvmLoc, 1, GL_FALSE, glm::value_ptr(PVM));
+        int pvmLoc;
+        setUniformMat4("PVM", PVM);
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // render cubes
         setActiveProgram(gl::programId);
-        glUseProgram(program.activeId);
-        glUniform3f(glGetUniformLocation(program.activeId, "objectColor"), 1.0f, 0.5f, 0.31f);
-        glUniform3f(glGetUniformLocation(program.activeId, "lightColor"), 1.0f, 1.0f, 1.0f);
-        glUniform3f(glGetUniformLocation(program.activeId, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(glGetUniformLocation(program.activeId, "viewPos"),
-                    program.activeCamera.mPosition.x,
-                    program.activeCamera.mPosition.y,
-                    program.activeCamera.mPosition.z);
+
+        glm::vec3 lightColor;
+        lightColor.x = sin(glfwGetTime() * 2.0f);
+        lightColor.y = sin(glfwGetTime() * 0.7f);
+        lightColor.z = sin(glfwGetTime() * 1.3f);
+
+        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+        setUniform3f("light.position", lightPos);
+        setUniform3f("light.ambient", ambientColor);
+        setUniform3f("light.diffuse", diffuseColor);
+        setUniform3f("light.specular", 1.0f, 1.0f, 1.0f);
+        setUniform3f("viewPos", program.activeCamera.mPosition);
 
         // draw one cube only
         glBindVertexArray(VAO);

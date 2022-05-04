@@ -5,6 +5,7 @@
 #include <stb_image.h>
 
 #include "windowing.h"
+#include "glm/gtc/type_ptr.hpp"
 
 // helper function for loading a shader file
 // TODO maybe prepend 'shaders/' folder to each function usage
@@ -88,6 +89,26 @@ GLuint createShader(GLenum shaderType, const char * filePath) {
     return linkShader(compileShader(shaderType, filePath));
 }
 
+void setUniform3f(const char * property, const glm::vec3 & vec) {
+    glUniform3f(glGetUniformLocation(program.activeId, property), vec.x, vec.y, vec.z);
+}
+
+void setUniform3f(const char * property, const float & x, const float & y, const float & z) {
+    glUniform3f(glGetUniformLocation(program.activeId, property), x, y, z);
+}
+
+void setUniform1i(const char * property, const int & in) {
+    glUniform1i(glGetUniformLocation(program.activeId, property), in);
+}
+
+void setUniform1f(const char * property, const float & f) {
+    glUniform1f(glGetUniformLocation(program.activeId, property), f);
+}
+
+void setUniformMat4(const char * property, const glm::mat4 & mat) {
+    glUniformMatrix4fv(glGetUniformLocation(program.activeId, property), 1, GL_FALSE, glm::value_ptr(mat));
+}
+
 GLuint loadTexture2D(const char * path) {
     GLuint texture = 0;
     glGenTextures(1, &texture);
@@ -134,4 +155,15 @@ GLuint loadTexture2D(const char * path, GLenum format) {
     stbi_image_free(data);
 
     return texture;
+}
+
+// TODO stop being lazy and fill this up
+void loadMaterials() {
+    Material emerald {
+            {0.0215, 0.1745, 0.0215},
+            {0.07568, 0.61424, 0.07568},
+            {0.633, 0.727811, 0.633},
+            0.6
+    };
+//    gl::materials.emplace(MaterialType::EMERALD, emerald);
 }

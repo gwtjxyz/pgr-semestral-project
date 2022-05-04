@@ -2,6 +2,7 @@
 
 #include <string>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include "config.h"
 
@@ -13,6 +14,16 @@ GLuint linkShader(GLuint shaderId);
 
 GLuint createShader(GLenum shaderType, const char * filePath);
 
+void setUniform3f(const char * property, const glm::vec3 & in);
+
+void setUniform3f(const char * property, const float & x, const float & y, const float & z);
+
+void setUniform1i(const char * property, const int & in);
+
+void setUniform1f(const char * property, const float & f);
+
+void setUniformMat4(const char * property, const glm::mat4 & mat);
+
 // Loads and binds texture from specified file.
 // Uses GL_REPEAT, RGB and linear mipmapping by default.
 // TODO make overloaded versions of this function to change default params
@@ -22,3 +33,5 @@ GLuint loadTexture2D(const char * path);
 // The texture format is set manually by the user.
 // Uses GL_REPEAT, linear mipmapping by default.
 GLuint loadTexture2D(const char * path, GLenum format);
+
+void loadMaterials();
