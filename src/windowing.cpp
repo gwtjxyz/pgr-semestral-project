@@ -9,6 +9,7 @@ void setCallbacks();
 
 void setActiveProgram(GLuint id) {
     program.activeId = id;
+    glUseProgram(program.activeId);
 }
 
 // GLFW and OpenGL program initialization function
