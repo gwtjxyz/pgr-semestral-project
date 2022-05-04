@@ -9,19 +9,21 @@
 #include "config.h"
 #include "windowing.h"
 #include "utils.h"
-#include "render.h"
-#include "camera.h"
 
 // loads shaders from files and links them into the program
 
-void updateUniformColor() {
-    float timeValue = glfwGetTime();
-    float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(gl::programId, "ourColor");
-    glUseProgram(gl::programId);
-    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+void loadMainShaders() {
+    setActiveProgram(gl::programId);
+    createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderSource.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderSource.frag)");
+
 }
 
+void loadLightingShaders() {
+    setActiveProgram(gl::lightingId);
+    createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderLightSrc.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderLightSrc.frag)");
+}
 
 int main() {
     if (!init()) {
@@ -31,47 +33,47 @@ int main() {
 
     // vertices and their respective buffers
     float vertices[] = {
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-            0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-            0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+            0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-            0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+            0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
 
     glm::vec3 cubePositions[] = {
@@ -93,17 +95,7 @@ int main() {
     };
 
     // load shaderinos
-    createShader(GL_VERTEX_SHADER, R"(..\shaders\vertexShaderSource.vert)");
-    createShader(GL_FRAGMENT_SHADER, R"(..\shaders\fragmentShaderSource.frag)");
-
-    // texture memes
-    glUseProgram(gl::programId);        // apparently you have to call this before setting textures, who knew
-    stbi_set_flip_vertically_on_load(true);
-    GLuint texture1 = loadTexture2D(R"(..\resources\container.jpg)", GL_RGB);
-    GLuint texture2 = loadTexture2D(R"(..\resources\awesomeface.png)", GL_RGBA);
-
-    glUniform1i(glGetUniformLocation(gl::programId, "texture1"), 0);
-    glUniform1i(glGetUniformLocation(gl::programId, "texture2"), 1);
+    loadMainShaders();
 
     GLuint VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -119,18 +111,31 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
-    // texture attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+
+    // lighting - light source creation
+    loadLightingShaders();
+
+    GLuint lightVAO;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+    // we only need to bind to the VBO, the container's VBO data already has the needed data
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // set the vertex attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) nullptr);
+    glEnableVertexAttribArray(0);
+
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
 
     // wireframes
     // TODO add this as some debugging feature
     if (Config::ENABLE_DEBUG)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    glEnable(GL_DEPTH_TEST);
 
     // main loop
     // TODO add proper input processing
@@ -140,35 +145,58 @@ int main() {
         float currentFrame = (float) glfwGetTime();
         gl::deltaTime = currentFrame - gl::lastFrame;
         gl::lastFrame = currentFrame;
+        lightPos.y = sin(glfwGetTime());
 
         // input
         processInput(gl::mainWindow);
 
         // render
-        glUseProgram(gl::programId);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // bind textures on respective texture units
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
-
-        // pass PVM matrix to shader
-
+        // set up PVM
         glm::mat4 proj = glm::perspective(glm::radians(program.activeCamera.mZoom),
                                           (float) Config::WINDOW_WIDTH / (float) Config::WINDOW_HEIGHT,
                                           Config::ZNEAR,
                                           Config::ZFAR);
-
         glm::mat4 view = program.activeCamera.getViewMatrix();
-
+        glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 PVM;
 
+        // render light
+        setActiveProgram(gl::lightingId);
+        glUseProgram(program.activeId);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
+        PVM = proj * view * model;
+
+        int pvmLoc = glGetUniformLocation(program.activeId, "PVM");
+        glUniformMatrix4fv(pvmLoc, 1, GL_FALSE, glm::value_ptr(PVM));
+        glBindVertexArray(lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // render cubes
+        setActiveProgram(gl::programId);
+        glUseProgram(program.activeId);
+        glUniform3f(glGetUniformLocation(program.activeId, "objectColor"), 1.0f, 0.5f, 0.31f);
+        glUniform3f(glGetUniformLocation(program.activeId, "lightColor"), 1.0f, 1.0f, 1.0f);
+        glUniform3f(glGetUniformLocation(program.activeId, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+        glUniform3f(glGetUniformLocation(program.activeId, "viewPos"),
+                    program.activeCamera.mPosition.x,
+                    program.activeCamera.mPosition.y,
+                    program.activeCamera.mPosition.z);
+
+        // draw one cube only
         glBindVertexArray(VAO);
-        for (unsigned int i = 0; i != 10; ++i) {
-            glm::mat4 model = glm::mat4(1.0f);
+        model = glm::mat4(1.0f);
+        PVM = proj * view * model;
+        pvmLoc = glGetUniformLocation(program.activeId, "PVM");
+        glUniformMatrix4fv(pvmLoc, 1, GL_FALSE, glm::value_ptr(PVM));
+        pvmLoc = glGetUniformLocation(program.activeId, "model");
+        glUniformMatrix4fv(pvmLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+/*        for (unsigned int i = 1; i != 10; ++i) {
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * (float) i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(0.5f, 1.0f, 0.0f));
@@ -178,7 +206,7 @@ int main() {
             glUniformMatrix4fv(pvmLoc, 1, GL_FALSE, glm::value_ptr(PVM));
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        }*/
 
         // check and call events and swap the buffers
         glfwSwapBuffers(gl::mainWindow);

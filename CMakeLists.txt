@@ -14,6 +14,7 @@ find_package(OpenGL REQUIRED)
 #set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
 set(NANOGUI_BUILD_PYTHON  OFF CACHE BOOL " " FORCE)
 set(NANOGUI_INSTALL       ON CACHE BOOL " " FORCE)
+set(NANOGUI_USE_GLAD ON)
 
 # Add the configurations from nanogui
 add_subdirectory(include/nanogui)
@@ -28,7 +29,7 @@ add_definitions(${NANOGUI_EXTRA_DEFS})
 include_directories(${NANOGUI_EXTRA_INCS})
 
 # Compile a target using NanoGUI
-add_executable(${PROJECT_NAME} src/main.cpp src/windowing.cpp src/utils.cpp src/config.cpp src/render.cpp src/camera.cpp src/camera.h)
+add_executable(${PROJECT_NAME} src/main.cpp src/windowing.cpp src/utils.cpp src/config.cpp src/render.cpp src/camera.cpp src/world/terrain.cpp src/objects/common.h)
 
 # Lastly, additional libraries may have been built for you.  In addition to linking
 # against NanoGUI, we need to link against those as well.

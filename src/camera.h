@@ -52,4 +52,5 @@ public:
     float mMovementSpeed;
     float mMouseSensitivity;
     float mZoom;
+    bool mIsSprinting;
 };

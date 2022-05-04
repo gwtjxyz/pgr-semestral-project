@@ -26,6 +26,7 @@ Camera::Camera(glm::vec3 position,
     mMovementSpeed = Config::SPEED;
     mMouseSensitivity = Config::SENSITIVITY;
     mZoom = Config::ZOOM;
+    mIsSprinting = false;
     updateCameraVectors();
 }
 
@@ -40,6 +41,7 @@ Camera::Camera(float posX, float posY, float posZ,
     mMovementSpeed = Config::SPEED;
     mMouseSensitivity = Config::SENSITIVITY;
     mZoom = Config::ZOOM;
+    mIsSprinting = false;
     updateCameraVectors();
 }
 
@@ -50,7 +52,12 @@ glm::mat4 Camera::getViewMatrix() {
 }
 
 void Camera::processKeyboard(CameraDirections direction, float deltaTime) {
-    float velocity = mMovementSpeed * deltaTime;
+    float velocity;
+    if (mIsSprinting)
+        velocity = mMovementSpeed * 4 * deltaTime;
+    else
+        velocity = mMovementSpeed * deltaTime;
+
     if (direction == CameraDirections::FORWARD)
         mPosition += mFront * velocity;
     if (direction == CameraDirections::BACKWARD)

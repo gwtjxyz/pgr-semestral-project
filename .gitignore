@@ -2,3 +2,4 @@
 /.idea/
 /cmake-build-debug-x64/
 /cmake-build-debug-x86/
+/cmake-build-debug-gcc-x64/

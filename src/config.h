@@ -25,12 +25,17 @@ namespace Config {
     const float SPEED = 2.5f;
     const float SENSITIVITY = 0.1f;
     const float ZOOM = 45.0f;
+
+    // Perlin noise - for terrain generation
+    const float Y_BOTTOM = -4.0f;               // lowest possible y - at result 0
+    const float Y_RANGE = 8.0f;                 // should be -2 * Y_BOTTOM
 }
 
 // namespace storing rendering-related variables
 // this changes dynamically during the program's execution
 namespace gl {
     extern GLuint programId;
+    extern GLuint lightingId;
     extern GLFWwindow * mainWindow;
     extern float deltaTime;
     extern float lastFrame;

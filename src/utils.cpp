@@ -4,6 +4,8 @@
 #include <iostream>
 #include <stb_image.h>
 
+#include "windowing.h"
+
 // helper function for loading a shader file
 // TODO maybe prepend 'shaders/' folder to each function usage
 std::string loadShaderFromFile(const char * filePath) {
@@ -57,7 +59,7 @@ GLuint compileShader(GLenum shaderType, const char * filePath) {
 // assumes the shader has been compiled prior to calling this function
 // and that the shader program ID has been initialized
 GLuint linkShader(GLuint shaderId) {
-    if (!gl::programId) {
+    if (!program.activeId) {
         std::cerr << "ERROR attempting to link shader ID " << shaderId << " before creating OpenGL program.\n" <<
         "Make sure you've initialized the program with a glCreateProgram() call before using this function.\n";
     }
@@ -66,14 +68,14 @@ GLuint linkShader(GLuint shaderId) {
         "Have you compiled the shader before calling this function?\n";
     }
 
-    glAttachShader(gl::programId, shaderId);
-    glLinkProgram(gl::programId);
+    glAttachShader(program.activeId, shaderId);
+    glLinkProgram(program.activeId);
 
     int success;
     char infoLog[512];
-    glGetProgramiv(gl::programId, GL_LINK_STATUS, &success);
+    glGetProgramiv(program.activeId, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(gl::programId, 512, nullptr, infoLog);
+        glGetProgramInfoLog(program.activeId, 512, nullptr, infoLog);
         std::cerr << "ERROR linking shader program! Log:\n" << infoLog << '\n';
     }
 

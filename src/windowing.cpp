@@ -7,6 +7,10 @@ Program program;
 
 void setCallbacks();
 
+void setActiveProgram(GLuint id) {
+    program.activeId = id;
+}
+
 // GLFW and OpenGL program initialization function
 bool init() {
     if (!glfwInit()) {
@@ -39,10 +43,14 @@ bool init() {
     setCallbacks();
 
     gl::programId = glCreateProgram();
+    gl::lightingId = glCreateProgram();
+    setActiveProgram(gl::programId);
 
     // create and set active camera
     Camera mainCamera(glm::vec3(0.0f, 0.0f, 3.0f));
     program.activeCamera = mainCamera;
+
+    glEnable(GL_DEPTH_TEST);
 
     return true;
 }
@@ -64,8 +72,8 @@ void processInput(GLFWwindow * window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         program.activeCamera.processKeyboard(CameraDirections::RIGHT, gl::deltaTime);
 
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        std::cout << "Camera values:\tYaw = " << program.activeCamera.mYaw << " |\tPitch = " << program.activeCamera.mPitch << std::endl;
+//    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+//        std::cout << "Camera values:\tYaw = " << program.activeCamera.mYaw << " |\tPitch = " << program.activeCamera.mPitch << std::endl;
 }
 
 void mouseCallback(GLFWwindow * window, double xPosIn, double yPosIn) {
@@ -91,11 +99,18 @@ void scrollCallback(GLFWwindow * window, double xOffset, double yOffset) {
     program.activeCamera.processMouseScroll((float) yOffset);
 }
 
+void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, int mods) {
+    if (mods & GLFW_MOD_SHIFT)
+        program.activeCamera.mIsSprinting = true;
+    else
+        program.activeCamera.mIsSprinting = false;
+}
+
 void setCallbacks() {
     glfwSetFramebufferSizeCallback(gl::mainWindow, framebufferSizeCallback);
     glfwSetCursorPosCallback(gl::mainWindow, mouseCallback);
     glfwSetScrollCallback(gl::mainWindow, scrollCallback);
-
+    glfwSetKeyCallback(gl::mainWindow, keyboardCallback);
     // tell GLFW to capture our mouse
     glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }

@@ -16,10 +16,6 @@
 
 #include "config.h"
 
-struct Object {
-
-};
-
 namespace Render {
     // model - transforms object space to world space
 
