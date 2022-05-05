@@ -14,6 +14,7 @@ find_package(OpenGL REQUIRED)
 #set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
 set(NANOGUI_BUILD_PYTHON  OFF CACHE BOOL " " FORCE)
 set(NANOGUI_INSTALL       ON CACHE BOOL " " FORCE)
+# GLAD compile flag to make compilation work cross-platform (on by default with MSVC)
 set(NANOGUI_USE_GLAD ON)
 
 # Add the configurations from nanogui
