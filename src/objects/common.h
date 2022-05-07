@@ -34,3 +34,28 @@ struct Material {
     glm::vec3 specular;
     float shininess;
 };
+
+enum class LightType {
+    DIRECTIONAL,
+    POINT,
+    SPOT
+};
+
+// Generic light container, not every field has to be
+// filled out - depends on the light
+struct Light {
+    LightType type;
+    glm::vec3 position;         // not necessary for directional
+    glm::vec3 direction;        // not necessary for point light
+
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+
+    float constant;             // not necessary for directional
+    float linear;               // not necessary for directional
+    float quadratic;            // not necessary for directional
+
+    float cutoff;               // specific for spot
+    float outerCutoff;          // specific for spot
+};

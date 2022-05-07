@@ -9,6 +9,8 @@
 #include "config.h"
 #include "windowing.h"
 #include "utils.h"
+#include "render.h"
+//#include "objects/common.h"
 
 // loads shaders from files and links them into the program
 
@@ -105,6 +107,13 @@ int main() {
             glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
+    glm::vec3 pointLightPositions[] = {
+            glm::vec3( 0.7f,  0.2f,  2.0f),
+            glm::vec3( 2.3f, -3.3f, -4.0f),
+            glm::vec3(-4.0f,  2.0f, -12.0f),
+            glm::vec3( 0.0f,  0.0f, -3.0f)
+    };
+
     // load shaderinos
     loadMainShaders();
 
@@ -170,7 +179,7 @@ int main() {
         processInput(gl::mainWindow);
 
         // render
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // set up PVM
@@ -207,21 +216,41 @@ int main() {
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
         glm::vec3 ambientColor = lightColor * glm::vec3(0.2f);
 
-        setUniform3f("light.position", lightPos);
-//        setUniform3f("light.direction", -0.2f, -1.0f, -0.3f);
-//        setUniform1f("light.constant", 1.0f);
-//        setUniform1f("light.linear", 0.09f);
-//        setUniform1f("light.quadratic", 0.032f);
-
-        setUniform3f("light.position", program.activeCamera.mPosition);
-        setUniform3f("light.direction", program.activeCamera.mFront);
-        setUniform1f("light.cutOff", glm::cos(glm::radians(12.5f)));
-        setUniform1f("light.outerCutOff", glm::cos(glm::radians(17.5f)));
-
-        setUniform3f("light.ambient", ambientColor);
-        setUniform3f("light.diffuse", diffuseColor);
-        setUniform3f("light.specular", 1.0f, 1.0f, 1.0f);
         setUniform3f("viewPos", program.activeCamera.mPosition);
+
+        // directional light
+        renderDirectionalLight("dirLight",
+                               {-0.2f, -1.0f, -0.3f},
+                               {0.05f, 0.05f, 0.05f},
+                               {0.4f, 0.4f, 0.4f},
+                               {0.5f, 0.5f, 0.5f});
+
+        // point lights
+        for (int i = 0; i != 4; ++i) {
+            std::string destination = "pointLights[";
+            destination.append(std::to_string(i)).append("]");
+            renderPointLight(destination.c_str(),
+                             pointLightPositions[i],
+                             {0.05f, 0.05f, 0.05f},
+                             {0.8f, 0.8f, 0.8f},
+                             {1.0f, 1.0f, 1.0f},
+                             1.0f,
+                             0.09f,
+                             0.032f);
+        }
+
+        // spot light
+        renderSpotlight("spotlight",
+                        program.activeCamera.mPosition,
+                        program.activeCamera.mFront,
+                        {0.0f, 0.0f, 0.0f},
+                        {1.0f, 1.0f, 1.0f},
+                        {1.0f, 1.0f, 1.0f},
+                        1.0f,
+                        0.09f,
+                        0.032f,
+                        glm::cos(glm::radians(12.5f)),
+                        glm::cos(glm::radians(15.0f)));
 
         // textures
         glActiveTexture(GL_TEXTURE0);

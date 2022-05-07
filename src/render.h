@@ -26,3 +26,30 @@ namespace Render {
     // projection - transforms camera space to clip space
     glm::mat4 projection();
 }
+
+void renderDirectionalLight(const char * varName,
+                            glm::vec3 direction,
+                            glm::vec3 ambient,
+                            glm::vec3 diffuse,
+                            glm::vec3 specular);
+
+void renderPointLight(const char * varName,
+                      glm::vec3 position,
+                      glm::vec3 ambient,
+                      glm::vec3 diffuse,
+                      glm::vec3 specular,
+                      float constant,
+                      float linear,
+                      float quadratic);
+
+void renderSpotlight(const char * varName,
+                     glm::vec3 position,
+                     glm::vec3 direction,
+                     glm::vec3 ambient,
+                     glm::vec3 diffuse,
+                     glm::vec3 specular,
+                     float constant,
+                     float linear,
+                     float quadratic,
+                     float cutoff,
+                     float outerCutoff);
