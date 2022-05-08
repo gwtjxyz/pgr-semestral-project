@@ -173,11 +173,16 @@ int main() {
     GLuint specularMap = loadTexture2D(R"(../resources/container2_specular.png)");
 
     // let's try loading in the generated terrain
-    float ** terrainMesh = generateTerrain(256, 32);
+    int terrainSize = 64;
+    float ** terrainMesh = generateTerrain(terrainSize, 32);
     // I think we have to do this
-    float * flattenedMesh = new float[256 * 256 * 8];
-    for (int i = 0; i != 256; ++i) {
-        std::memcpy(&flattenedMesh[i * 256 * 8], terrainMesh[i], 256 * 8 * sizeof(float));
+    // TODO make it also generate indices so this actually works
+    float * flattenedMesh = new float[terrainSize * terrainSize * 8];
+    for (int i = 0; i != terrainSize; ++i) {
+        for (int j = 0; j != terrainSize * 8; ++j) {
+            flattenedMesh[i * terrainSize + j] = terrainMesh[i][j];
+        }
+//        std::memcpy(&flattenedMesh[i * terrainSize * 8], terrainMesh[i], terrainSize * 8);
     }
 
     GLuint terrainVAO, terrainVBO;
@@ -185,7 +190,7 @@ int main() {
     glGenBuffers(1, &terrainVBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
-    glBufferData(GL_ARRAY_BUFFER, 256 * 256 * 8 * sizeof(float), flattenedMesh, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, terrainSize * terrainSize * 8 * sizeof(float), flattenedMesh, GL_STATIC_DRAW);
 
     glBindVertexArray(terrainVAO);
     // terrain position
@@ -334,7 +339,7 @@ int main() {
         setUniformMat4("PVM", PVM);
         setUniformMat4("model", terrainModel);
 
-        glDrawArrays(GL_TRIANGLES, 0, 256 * 256 * 3);
+        glDrawArrays(   GL_TRIANGLE_FAN, 0, terrainSize * terrainSize * 3);
 
 //        switch (glGetError()) {
 //            case GL_NO_ERROR:
@@ -365,7 +370,7 @@ int main() {
 
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteBuffers(1, &VBO);
-    freeTerrain(terrainMesh, 256);
+    freeTerrain(terrainMesh, terrainSize);
     delete[] flattenedMesh;
 
     glfwTerminate();
