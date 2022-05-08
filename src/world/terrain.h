@@ -18,7 +18,7 @@ public:
     Perlin();
     // Generates a new permutation vector based on seed value
     Perlin(unsigned int seed);
-    // Returns a noise value
+    // Returns a noise value, Z can be left empty for 2D noise
     double noise(double x, double y, double z);
 private:
     double fade(double t);
@@ -31,7 +31,6 @@ private:
     std::vector<int> mPermutation;
 };
 
-float * generateTerrain(int size) {
-    // TODO
-    return 0;
-}
+float ** generateTerrain(int size, int repeat);
+
+void freeTerrain(float **& mesh, int size);

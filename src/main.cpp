@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -10,20 +11,25 @@
 #include "windowing.h"
 #include "utils.h"
 #include "render.h"
+#include "world/terrain.h"
 //#include "objects/common.h"
 
 // loads shaders from files and links them into the program
 
 void loadMainShaders() {
-    setActiveProgram(gl::programId);
+    program.activeId = gl::programId;
+//    setActiveProgram(gl::programId);
     createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderSource.vert)");
     createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderSource.frag)");
+    glUseProgram(program.activeId);
 }
 
 void loadLightSourceShaders() {
-    setActiveProgram(gl::lightingId);
+//    setActiveProgram(gl::lightingId);
+    program.activeId = gl::lightingId;
     createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderLightSrc.vert)");
     createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderLightSrc.frag)");
+    glUseProgram(program.activeId);
 }
 
 void drawTenCubes(const glm::mat4 & proj, const glm::mat4 & view, const glm::vec3 * cubePositions) {
@@ -116,11 +122,32 @@ int main() {
 
     // load shaderinos
     loadMainShaders();
+//    switch (glGetError()) {
+//        case GL_NO_ERROR:
+//            break;
+//        case GL_INVALID_ENUM:
+//            std::cerr << "GL ERROR: INVALID ENUM" << std::endl;
+//            break;
+//        case GL_INVALID_VALUE:
+//            std::cerr << "GL ERROR: INVALID VALUE" << std::endl;
+//            break;
+//        case GL_INVALID_OPERATION:
+//            std::cerr << "GL ERROR: INVALID OPERATION" << std::endl;
+//            break;
+//        case GL_INVALID_FRAMEBUFFER_OPERATION:
+//            std::cerr << "GL ERROR: INVALID FRAMEBUFFER OPERATION" << std::endl;
+//            break;
+//        case GL_OUT_OF_MEMORY:
+//            std::cerr << "GL ERROR: OUT OF MEMORY" << std::endl;
+//            break;
+//        default:
+//            break;
+//    }
 
     setActiveProgram(gl::programId);
     setUniform1i("material.diffuse", 0);
     setUniform1i("material.specular", 1);
-    setUniform3f("material.specular", 0.5f, 0.5f, 0.5f);
+//    setUniform3f("material.specular", 0.5f, 0.5f, 0.5f);
     setUniform1f("material.shininess", 32.0f);
 
     GLuint cubeVAO, VBO;
@@ -145,6 +172,35 @@ int main() {
     GLuint diffuseMap = loadTexture2D(R"(../resources/container2.png)");
     GLuint specularMap = loadTexture2D(R"(../resources/container2_specular.png)");
 
+    // let's try loading in the generated terrain
+    float ** terrainMesh = generateTerrain(256, 32);
+    // I think we have to do this
+    float * flattenedMesh = new float[256 * 256 * 8];
+    for (int i = 0; i != 256; ++i) {
+        std::memcpy(&flattenedMesh[i * 256 * 8], terrainMesh[i], 256 * 8 * sizeof(float));
+    }
+
+    GLuint terrainVAO, terrainVBO;
+    glGenVertexArrays(1, &terrainVAO);
+    glGenBuffers(1, &terrainVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
+    glBufferData(GL_ARRAY_BUFFER, 256 * 256 * 8 * sizeof(float), flattenedMesh, GL_STATIC_DRAW);
+
+    glBindVertexArray(terrainVAO);
+    // terrain position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
+    glEnableVertexAttribArray(0);
+    // terrain normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // terrain textures
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    GLuint grassDiffuseMap = loadTexture2D(R"(../resources/grass.jpg)");
+    GLuint grassSpecularMap = loadTexture2D(R"(../resources/grass.jpg)");
+
     // lighting - light source creation
     loadLightSourceShaders();
 
@@ -162,8 +218,6 @@ int main() {
 
     // wireframes
     // TODO add this as some debugging feature
-    if (Config::ENABLE_DEBUG)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // main loop
     // TODO add proper input processing
@@ -178,8 +232,13 @@ int main() {
         // input
         processInput(gl::mainWindow);
 
+        if (Config::ENABLE_DEBUG)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
         // render
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // set up PVM
@@ -221,7 +280,7 @@ int main() {
         // directional light
         renderDirectionalLight("dirLight",
                                {-0.2f, -1.0f, -0.3f},
-                               {0.05f, 0.05f, 0.05f},
+                               {0.60f, 0.60f, 0.60f},
                                {0.4f, 0.4f, 0.4f},
                                {0.5f, 0.5f, 0.5f});
 
@@ -261,6 +320,44 @@ int main() {
         glBindVertexArray(cubeVAO);
         drawTenCubes(proj, view, cubePositions);
 
+        // terrain (please work)
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, grassDiffuseMap);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, grassSpecularMap);
+
+        glBindVertexArray(terrainVAO);
+        glm::mat4 terrainModel = glm::mat4(1.0f);
+        terrainModel = glm::translate(terrainModel, {1.2f, 1.0f, 2.0f});
+        PVM = proj * view * terrainModel;
+
+        setUniformMat4("PVM", PVM);
+        setUniformMat4("model", terrainModel);
+
+        glDrawArrays(GL_TRIANGLES, 0, 256 * 256 * 3);
+
+//        switch (glGetError()) {
+//            case GL_NO_ERROR:
+//                break;
+//            case GL_INVALID_ENUM:
+//                std::cerr << "GL ERROR: INVALID ENUM" << std::endl;
+//                break;
+//            case GL_INVALID_VALUE:
+//                std::cerr << "GL ERROR: INVALID VALUE" << std::endl;
+//                break;
+//            case GL_INVALID_OPERATION:
+//                std::cerr << "GL ERROR: INVALID OPERATION" << std::endl;
+//                break;
+//            case GL_INVALID_FRAMEBUFFER_OPERATION:
+//                std::cerr << "GL ERROR: INVALID FRAMEBUFFER OPERATION" << std::endl;
+//                break;
+//            case GL_OUT_OF_MEMORY:
+//                std::cerr << "GL ERROR: OUT OF MEMORY" << std::endl;
+//                break;
+//            default:
+//                break;
+//        }
+
         // check and call events and swap the buffers
         glfwSwapBuffers(gl::mainWindow);
         glfwPollEvents();
@@ -268,6 +365,8 @@ int main() {
 
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteBuffers(1, &VBO);
+    freeTerrain(terrainMesh, 256);
+    delete[] flattenedMesh;
 
     glfwTerminate();
     return 0;

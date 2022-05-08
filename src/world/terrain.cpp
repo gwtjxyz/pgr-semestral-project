@@ -10,6 +10,7 @@
 */
 //----------------------------------------------------------------------------------------
 #include "terrain.h"
+#include "glm/glm.hpp"
 
 #include <numeric>
 #include <algorithm>
@@ -99,4 +100,127 @@ double Perlin::grad(int hash, double x, double y, double z) {
     double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
 
     return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+}
+
+// helper function for mesh generation
+// could be optimized to be better/faster/more efficient
+glm::vec3 calculateNormals(int i, int j, int size, float **& mesh) {
+    int stride = 8;
+    glm::vec3 result = glm::vec3(0.0f);
+    // I don't know how to describe what I'm doing with words,
+    // so I'll just link this picture here: https://i.imgur.com/c9309UB.png
+    // this does a bunch of unnecessary calculations and can definitely be optimized
+    // to work faster, but we only run this once and the additional
+    // calculations themselves aren't too heavy, so it doesn't matter too much.
+    if (i > 0 && j > 0) {
+        // 1 x 2
+        glm::vec3 vecTop = glm::vec3(mesh[j - 1][i * stride],
+                                   mesh[j - 1][i * stride + 1],
+                                   mesh[j - 1][i * stride + 2]);
+        glm::vec3 vecLeft = glm::vec3(mesh[j][(i - 1) * stride],
+                                      mesh[j][(i - 1) * stride + 1],
+                                      mesh[j][(i - 1) * stride + 2]);
+        result += glm::cross(vecTop, vecLeft);
+    }
+    if (i > 0 && j < size - 1) {
+        // 2 x 3
+        glm::vec3 vecLeft = glm::vec3(mesh[j][(i - 1) * stride],
+                                      mesh[j][(i - 1) * stride + 1],
+                                      mesh[j][(i - 1) * stride + 2]);
+        glm::vec3 vecBottomLeft = glm::vec3(mesh[j + 1][(i - 1) * stride],
+                                            mesh[j + 1][(i - 1) * stride + 1],
+                                            mesh[j + 1][(i - 1) * stride + 2]);
+        result += glm::cross(vecLeft, vecBottomLeft);
+        // 3 x 4
+        // don't have to do a check for the next scenario
+        // if the previous one exists so does this one and vice-versa
+        glm::vec3 vecBottom = glm::vec3(mesh[j + 1][i * stride],
+                                        mesh[j + 1][i * stride + 1],
+                                        mesh[j + 1][i * stride + 2]);
+        result += glm::cross(vecBottomLeft, vecBottom);
+    }
+    if (i < size - 1 && j < size - 1) {
+        // 4 x 5
+        glm::vec3 vecBottom = glm::vec3(mesh[j + 1][i * stride],
+                                        mesh[j + 1][i * stride + 1],
+                                        mesh[j + 1][i * stride + 2]);
+        glm::vec3 vecRight = glm::vec3(mesh[j][(i + 1) * stride],
+                                       mesh[j][(i + 1) * stride + 1],
+                                       mesh[j][(i + 1) * stride + 2]);
+        result += glm::cross(vecBottom, vecRight);
+    }
+    if (i < size - 1 && j > 0) {
+        // 6 x 1 and 5 x 6
+        // same reasoning as 2 x 3 and 3 x 4
+        glm::vec3 vecRight = glm::vec3(mesh[j][(i + 1) * stride],
+                                       mesh[j][(i + 1) * stride + 1],
+                                       mesh[j][(i + 1) * stride + 2]);
+        glm::vec3 vecTopRight = glm::vec3(mesh[j - 1][(i + 1) * stride],
+                                          mesh[j - 1][(i + 1) * stride + 1],
+                                          mesh[j - 1][(i + 1) * stride + 2]);
+        result += glm::cross(vecRight, vecTopRight);
+
+        glm::vec3 vecTop = glm::vec3(mesh[j - 1][i * stride],
+                                     mesh[j - 1][i * stride + 1],
+                                     mesh[j - 1][i * stride + 2]);
+        result += glm::cross(vecTopRight, vecRight);
+    }
+    return glm::normalize(result);
+}
+
+// generates square terrain with dimensions of n * n, where n == size
+// repeat = after how many vertices to start repeating textures
+// (if set to zero, we do one biiiiiiiig stretch)
+float ** generateTerrain(int size, int repeat) {
+    // size == n; we need 8 floats for each vertex
+    // 3 for xyz, 3 for normal vector, 2 for texture
+    int normalOffset = 3, textureOffset = 6, stride = 8;
+    float ** mesh = new float*[size];
+    for (int i = 0; i != size; ++i)
+        mesh[i] = new float[size * 8];
+    // first, fill up the vertex coordinates; X,Z are on a grid, Y we get from Perlin noise
+    Perlin noiseGenerator;
+    for (int j = 0; j != size; ++j) {       // j == rows
+        for (int i = 0; i != size; ++i) {   // i == columns
+            mesh[j][stride * i]     = (float) i;    // x coordinate
+            mesh[j][stride * i + 1] = (float) noiseGenerator.noise(i, j, 0);    // y coordinate
+            mesh[j][stride * i + 2] = (float) j;    // z coordinate
+        }
+    }
+    // second, calculate and assign normals
+    // we have up to 6 points adjacent to the one being processed
+    // use them to calculate a normal vector by going through them in
+    // counter-clockwise order
+    for (int j = 0; j != size; ++j) {
+        for (int i = 0; i != size; ++i) {
+            glm::vec3 normal = calculateNormals(i, j, size, mesh);
+            mesh[j][stride * i + normalOffset]     = normal.x;
+            mesh[j][stride * i + normalOffset + 1] = normal.y;
+            mesh[j][stride * i + normalOffset + 2] = normal.z;
+        }
+    }
+    // lastly, fill in UV coordinates
+    float texU = 0.0f, texV = 0.0f;
+    float step;
+    if (repeat == 0)
+        step = 1.0f / (float) size;
+    else
+        step = 1.0f / (float) repeat;
+    for (int j = 0; j != size; ++j) {
+        for (int i = 0; i != size; ++i) {
+            mesh[j][stride * i + textureOffset    ] = texU;
+            mesh[j][stride * i + textureOffset + 1] = texV;
+            texU += step;
+        }
+        texU = 0.0f;
+        texV += step;
+    }
+    return mesh;
+}
+
+void freeTerrain(float **& mesh, int size) {
+    for (int i = 0; i != size; ++i)
+        delete[] mesh[i];
+    delete[] mesh;
+    mesh = nullptr;
 }
