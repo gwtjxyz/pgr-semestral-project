@@ -10,12 +10,14 @@
 */
 //----------------------------------------------------------------------------------------
 #include "terrain.h"
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
 #include <numeric>
 #include <algorithm>
 #include <random>
 #include <cmath>
+
+#include "config.h"
 
 // TODO make this less hardcoded and more adaptable to terrains of various sizes
 Perlin::Perlin() {
@@ -163,7 +165,7 @@ glm::vec3 calculateNormals(int i, int j, int size, float **& mesh) {
         glm::vec3 vecTop = glm::vec3(mesh[j - 1][i * stride],
                                      mesh[j - 1][i * stride + 1],
                                      mesh[j - 1][i * stride + 2]);
-        result += glm::cross(vecTopRight, vecRight);
+        result += glm::cross(vecTopRight, vecTop);
     }
     return glm::normalize(result);
 }
@@ -183,7 +185,9 @@ float ** generateTerrain(int size, int repeat) {
     for (int j = 0; j != size; ++j) {       // j == rows
         for (int i = 0; i != size; ++i) {   // i == columns
             mesh[j][stride * i]     = (float) i;    // x coordinate
-            mesh[j][stride * i + 1] = (float) noiseGenerator.noise(i, j, 0);    // y coordinate
+            mesh[j][stride * i + 1] = (float) noiseGenerator.noise(Config::NOISE_INTENSITY * i,
+                                                                   Config::NOISE_INTENSITY * j,
+                                                                   Config::Z_CONSTANT);    // y coordinate
             mesh[j][stride * i + 2] = (float) j;    // z coordinate
         }
     }
@@ -216,6 +220,32 @@ float ** generateTerrain(int size, int repeat) {
         texV += step;
     }
     return mesh;
+}
+
+int calculateNrTriangles(int size) {
+    int nrSquares = (size - 1) * (size - 1);
+    int nrTriangles = nrSquares * 2;
+    return nrTriangles;
+}
+
+unsigned int * generateTerrainIndices(int size, int nrTriangles) {
+    unsigned int * indices = new unsigned int[nrTriangles * 3];
+    int idx = 0, stride = 3;
+    // we fill in 2 triangles at a time, nothing to
+    // fill out on the outer edge, so we skip that
+    for (int j = 0; j != size - 1; ++j) {
+        for (int i = 0; i != size - 1; ++i) {
+            indices[idx]     = i       + (size * j);
+            indices[idx + 1] = (i + 1) + (size * j);
+            indices[idx + 2] = i       + (size * (j + 1));
+            idx += stride;
+            indices[idx]     = (i + 1) + (size * j);
+            indices[idx + 1] = (i + 1) + (size * (j + 1));
+            indices[idx + 2] = i       + (size * (j + 1));
+            idx += stride;
+        }
+    }
+    return indices;
 }
 
 void freeTerrain(float **& mesh, int size) {

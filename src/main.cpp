@@ -180,19 +180,26 @@ int main() {
     float * flattenedMesh = new float[terrainSize * terrainSize * 8];
     for (int i = 0; i != terrainSize; ++i) {
         for (int j = 0; j != terrainSize * 8; ++j) {
-            flattenedMesh[i * terrainSize + j] = terrainMesh[i][j];
+            flattenedMesh[i * terrainSize * 8 + j] = terrainMesh[i][j];
         }
 //        std::memcpy(&flattenedMesh[i * terrainSize * 8], terrainMesh[i], terrainSize * 8);
     }
+    int nrTerrainTriangles = calculateNrTriangles(terrainSize);
+    GLuint * terrainIndices = generateTerrainIndices(terrainSize, nrTerrainTriangles);
 
-    GLuint terrainVAO, terrainVBO;
+
+    GLuint terrainVAO, terrainVBO, terrainEBO;
     glGenVertexArrays(1, &terrainVAO);
     glGenBuffers(1, &terrainVBO);
+    glGenBuffers(1, &terrainEBO);
+    glBindVertexArray(terrainVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
     glBufferData(GL_ARRAY_BUFFER, terrainSize * terrainSize * 8 * sizeof(float), flattenedMesh, GL_STATIC_DRAW);
 
-    glBindVertexArray(terrainVAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, nrTerrainTriangles * 3 * sizeof(GLuint), terrainIndices, GL_STATIC_DRAW);
+
     // terrain position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
@@ -332,6 +339,7 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, grassSpecularMap);
 
         glBindVertexArray(terrainVAO);
+
         glm::mat4 terrainModel = glm::mat4(1.0f);
         terrainModel = glm::translate(terrainModel, {1.2f, 1.0f, 2.0f});
         PVM = proj * view * terrainModel;
@@ -339,7 +347,9 @@ int main() {
         setUniformMat4("PVM", PVM);
         setUniformMat4("model", terrainModel);
 
-        glDrawArrays(   GL_TRIANGLE_FAN, 0, terrainSize * terrainSize * 3);
+        glEnableVertexAttribArray(0);
+//        glDrawArrays(GL_TRIANGLES, 0, terrainSize * terrainSize * 8);
+        glDrawElements(GL_TRIANGLES, nrTerrainTriangles * 3, GL_UNSIGNED_INT, 0);
 
 //        switch (glGetError()) {
 //            case GL_NO_ERROR:

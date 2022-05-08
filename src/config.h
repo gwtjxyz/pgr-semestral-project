@@ -30,6 +30,8 @@ namespace Config {
     const float ZOOM = 45.0f;
 
     // Perlin noise - for terrain generation
+    const float Z_CONSTANT = 0.8f;
+    const int NOISE_INTENSITY = 10;
     const float Y_BOTTOM = -4.0f;               // lowest possible y - at result 0
     const float Y_RANGE = 8.0f;                 // should be -2 * Y_BOTTOM
 }

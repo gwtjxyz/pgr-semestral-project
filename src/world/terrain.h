@@ -33,4 +33,8 @@ private:
 
 float ** generateTerrain(int size, int repeat);
 
+int calculateNrTriangles(int size);
+
+unsigned int * generateTerrainIndices(int size, int nrTriangles);
+
 void freeTerrain(float **& mesh, int size);
