@@ -5,7 +5,6 @@
 #include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "config.h"
 #include "windowing.h"
@@ -122,27 +121,6 @@ int main() {
 
     // load shaderinos
     loadMainShaders();
-//    switch (glGetError()) {
-//        case GL_NO_ERROR:
-//            break;
-//        case GL_INVALID_ENUM:
-//            std::cerr << "GL ERROR: INVALID ENUM" << std::endl;
-//            break;
-//        case GL_INVALID_VALUE:
-//            std::cerr << "GL ERROR: INVALID VALUE" << std::endl;
-//            break;
-//        case GL_INVALID_OPERATION:
-//            std::cerr << "GL ERROR: INVALID OPERATION" << std::endl;
-//            break;
-//        case GL_INVALID_FRAMEBUFFER_OPERATION:
-//            std::cerr << "GL ERROR: INVALID FRAMEBUFFER OPERATION" << std::endl;
-//            break;
-//        case GL_OUT_OF_MEMORY:
-//            std::cerr << "GL ERROR: OUT OF MEMORY" << std::endl;
-//            break;
-//        default:
-//            break;
-//    }
 
     setActiveProgram(gl::programId);
     setUniform1i("material.diffuse", 0);
@@ -172,46 +150,7 @@ int main() {
     GLuint diffuseMap = loadTexture2D(R"(../resources/container2.png)");
     GLuint specularMap = loadTexture2D(R"(../resources/container2_specular.png)");
 
-    // let's try loading in the generated terrain
-    int terrainSize = 64;
-    float ** terrainMesh = generateTerrain(terrainSize, 32);
-    // I think we have to do this
-    // TODO make it also generate indices so this actually works
-    float * flattenedMesh = new float[terrainSize * terrainSize * 8];
-    for (int i = 0; i != terrainSize; ++i) {
-        for (int j = 0; j != terrainSize * 8; ++j) {
-            flattenedMesh[i * terrainSize * 8 + j] = terrainMesh[i][j];
-        }
-//        std::memcpy(&flattenedMesh[i * terrainSize * 8], terrainMesh[i], terrainSize * 8);
-    }
-    int nrTerrainTriangles = calculateNrTriangles(terrainSize);
-    GLuint * terrainIndices = generateTerrainIndices(terrainSize, nrTerrainTriangles);
-
-
-    GLuint terrainVAO, terrainVBO, terrainEBO;
-    glGenVertexArrays(1, &terrainVAO);
-    glGenBuffers(1, &terrainVBO);
-    glGenBuffers(1, &terrainEBO);
-    glBindVertexArray(terrainVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
-    glBufferData(GL_ARRAY_BUFFER, terrainSize * terrainSize * 8 * sizeof(float), flattenedMesh, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, nrTerrainTriangles * 3 * sizeof(GLuint), terrainIndices, GL_STATIC_DRAW);
-
-    // terrain position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
-    glEnableVertexAttribArray(0);
-    // terrain normals
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // terrain textures
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    GLuint grassDiffuseMap = loadTexture2D(R"(../resources/grass.jpg)");
-    GLuint grassSpecularMap = loadTexture2D(R"(../resources/grass.jpg)");
+    Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
     // lighting - light source creation
     loadLightSourceShaders();
@@ -254,10 +193,8 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // set up PVM
-        glm::mat4 proj = glm::perspective(glm::radians(program.activeCamera.mZoom),
-                                          (float) Config::WINDOW_WIDTH / (float) Config::WINDOW_HEIGHT,
-                                          Config::ZNEAR,
-                                          Config::ZFAR);
+        glm::mat4 proj = Render::projection();
+
         glm::mat4 view = program.activeCamera.getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 PVM;
@@ -270,7 +207,6 @@ int main() {
         model = glm::scale(model, glm::vec3(0.2f));
         PVM = proj * view * model;
 
-        int pvmLoc;
         setUniformMat4("PVM", PVM);
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -288,11 +224,14 @@ int main() {
         glm::vec3 ambientColor = lightColor * glm::vec3(0.2f);
 
         setUniform3f("viewPos", program.activeCamera.mPosition);
+//        glm::vec3 fogCenter = program.activeCamera.mPosition;
+//        fogCenter = fogCenter * glm::mat3(PVM);
+//        setUniform3f("fogCenter", fogCenter);
 
         // directional light
         renderDirectionalLight("dirLight",
                                {-0.2f, -1.0f, -0.3f},
-                               {0.60f, 0.60f, 0.60f},
+                               {0.06f, 0.06f, 0.06f},
                                {0.4f, 0.4f, 0.4f},
                                {0.5f, 0.5f, 0.5f});
 
@@ -333,45 +272,7 @@ int main() {
         drawTenCubes(proj, view, cubePositions);
 
         // terrain (please work)
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, grassDiffuseMap);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, grassSpecularMap);
-
-        glBindVertexArray(terrainVAO);
-
-        glm::mat4 terrainModel = glm::mat4(1.0f);
-        terrainModel = glm::translate(terrainModel, {1.2f, 1.0f, 2.0f});
-        PVM = proj * view * terrainModel;
-
-        setUniformMat4("PVM", PVM);
-        setUniformMat4("model", terrainModel);
-
-        glEnableVertexAttribArray(0);
-//        glDrawArrays(GL_TRIANGLES, 0, terrainSize * terrainSize * 8);
-        glDrawElements(GL_TRIANGLES, nrTerrainTriangles * 3, GL_UNSIGNED_INT, 0);
-
-//        switch (glGetError()) {
-//            case GL_NO_ERROR:
-//                break;
-//            case GL_INVALID_ENUM:
-//                std::cerr << "GL ERROR: INVALID ENUM" << std::endl;
-//                break;
-//            case GL_INVALID_VALUE:
-//                std::cerr << "GL ERROR: INVALID VALUE" << std::endl;
-//                break;
-//            case GL_INVALID_OPERATION:
-//                std::cerr << "GL ERROR: INVALID OPERATION" << std::endl;
-//                break;
-//            case GL_INVALID_FRAMEBUFFER_OPERATION:
-//                std::cerr << "GL ERROR: INVALID FRAMEBUFFER OPERATION" << std::endl;
-//                break;
-//            case GL_OUT_OF_MEMORY:
-//                std::cerr << "GL ERROR: OUT OF MEMORY" << std::endl;
-//                break;
-//            default:
-//                break;
-//        }
+        renderTerrain(terrain, proj, view);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(gl::mainWindow);
@@ -380,8 +281,7 @@ int main() {
 
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteBuffers(1, &VBO);
-    freeTerrain(terrainMesh, terrainSize);
-    delete[] flattenedMesh;
+    deleteTerrain(terrain);
 
     glfwTerminate();
     return 0;

@@ -12,6 +12,20 @@
 //----------------------------------------------------------------------------------------
 #include <vector>
 
+#include "config.h"
+
+struct Terrain {
+    GLuint VAO;
+    GLuint VBO;
+    GLuint EBO;
+    GLuint diffuse;
+    GLuint specular;
+    float * mesh = nullptr;
+    unsigned int * indices = nullptr;
+    unsigned int nrTriangles;
+    int size;
+};
+
 class Perlin {
 public:
     // Initializes with ref values for the permutation vector
@@ -31,10 +45,14 @@ private:
     std::vector<int> mPermutation;
 };
 
-float ** generateTerrain(int size, int repeat);
+float ** generateTerrain2DMesh(int size, int repeat);
 
 int calculateNrTriangles(int size);
 
-unsigned int * generateTerrainIndices(int size, int nrTriangles);
+unsigned int * generateTerrainIndices(int size, unsigned int nrTriangles);
 
-void freeTerrain(float **& mesh, int size);
+void freeTerrain2DMesh(float **& mesh, int size);
+
+Terrain createTerrain(int size, int texRepeat);
+
+void deleteTerrain(Terrain & terrain);

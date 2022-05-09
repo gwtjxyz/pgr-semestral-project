@@ -10,6 +10,7 @@
 */
 //----------------------------------------------------------------------------------------
 #include "terrain.h"
+#include "utils.h"
 #include <glm/glm.hpp>
 
 #include <numeric>
@@ -17,7 +18,7 @@
 #include <random>
 #include <cmath>
 
-#include "config.h"
+
 
 // TODO make this less hardcoded and more adaptable to terrains of various sizes
 Perlin::Perlin() {
@@ -173,7 +174,7 @@ glm::vec3 calculateNormals(int i, int j, int size, float **& mesh) {
 // generates square terrain with dimensions of n * n, where n == size
 // repeat = after how many vertices to start repeating textures
 // (if set to zero, we do one biiiiiiiig stretch)
-float ** generateTerrain(int size, int repeat) {
+float ** generateTerrain2DMesh(int size, int repeat) {
     // size == n; we need 8 floats for each vertex
     // 3 for xyz, 3 for normal vector, 2 for texture
     int normalOffset = 3, textureOffset = 6, stride = 8;
@@ -228,7 +229,7 @@ int calculateNrTriangles(int size) {
     return nrTriangles;
 }
 
-unsigned int * generateTerrainIndices(int size, int nrTriangles) {
+unsigned int * generateTerrainIndices(int size, unsigned int nrTriangles) {
     unsigned int * indices = new unsigned int[nrTriangles * 3];
     int idx = 0, stride = 3;
     // we fill in 2 triangles at a time, nothing to
@@ -248,9 +249,58 @@ unsigned int * generateTerrainIndices(int size, int nrTriangles) {
     return indices;
 }
 
-void freeTerrain(float **& mesh, int size) {
+void freeTerrain2DMesh(float **& mesh, int size) {
     for (int i = 0; i != size; ++i)
         delete[] mesh[i];
     delete[] mesh;
     mesh = nullptr;
+}
+
+Terrain createTerrain(int terrainSize, int texRepeat) {
+    Terrain terrain;
+    glGenVertexArrays(1, &terrain.VAO);
+    glGenBuffers(1, &terrain.VBO);
+    glGenBuffers(1, &terrain.EBO);
+    glBindVertexArray(terrain.VAO);
+    terrain.size = terrainSize;
+    // generate a 2D mesh array, then flatten it
+    float ** tempMesh = generateTerrain2DMesh(terrain.size, texRepeat);
+    terrain.mesh = new float[terrain.size * terrain.size * 8];
+    for (int i = 0; i != terrain.size; ++i) {
+        for (int j = 0; j != terrain.size * 8; ++j) {
+            terrain.mesh[i * terrain.size * 8 + j] = tempMesh[i][j];
+        }
+    }
+
+    terrain.nrTriangles = calculateNrTriangles(terrain.size);
+    terrain.indices = generateTerrainIndices(terrain.size, terrain.nrTriangles);
+
+    glBindBuffer(GL_ARRAY_BUFFER, terrain.VBO);
+    glBufferData(GL_ARRAY_BUFFER, terrain.size * terrain.size * 8 * sizeof(float), terrain.mesh, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrain.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, terrain.nrTriangles * 3 * sizeof(GLuint), terrain.indices, GL_STATIC_DRAW);
+
+    // terrain position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
+    glEnableVertexAttribArray(0);
+    // terrain normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // terrain textures
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    terrain.diffuse = loadTexture2D(Config::TERRAIN_TEXTURE_DIFFUSE);
+    terrain.specular = loadTexture2D(Config::TERRAIN_TEXTURE_SPECULAR);
+
+    freeTerrain2DMesh(tempMesh, terrain.size);
+    return terrain;
+}
+
+void deleteTerrain(Terrain & terrain) {
+    glDeleteVertexArrays(1, &terrain.VAO);
+    glDeleteBuffers(1, &terrain.VBO);
+    delete[] terrain.mesh;
+    delete[] terrain.indices;
 }

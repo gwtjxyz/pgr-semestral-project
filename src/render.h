@@ -15,6 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "config.h"
+#include "world/terrain.h"
 
 namespace Render {
     // model - transforms object space to world space
@@ -53,3 +54,6 @@ void renderSpotlight(const char * varName,
                      float quadratic,
                      float cutoff,
                      float outerCutoff);
+
+// TODO
+void renderTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view);

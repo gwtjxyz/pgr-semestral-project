@@ -66,3 +66,23 @@ void renderSpotlight(const char * varName,
     setUniform1f((destination + ".outerCutoff").c_str(), outerCutoff);
 
 }
+
+void renderTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view) {
+    // set up textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, terrain.diffuse);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, terrain.specular);
+
+    glBindVertexArray(terrain.VAO);
+    // move terrain to be centered around [0,0,0]
+    glm::mat4 terrainModel = glm::mat4(1.0f);
+    terrainModel = glm::translate(terrainModel, {-((float) terrain.size / 4), -6.0f, -((float) terrain.size / 4)});
+    glm::mat4 PVM = proj * view * terrainModel;
+
+    setUniformMat4("PVM", PVM);
+    setUniformMat4("model", terrainModel);
+
+    glEnableVertexAttribArray(0);
+    glDrawElements(GL_TRIANGLES, terrain.nrTriangles * 3, GL_UNSIGNED_INT, 0);
+}

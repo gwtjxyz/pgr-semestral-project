@@ -34,6 +34,12 @@ namespace Config {
     const int NOISE_INTENSITY = 10;
     const float Y_BOTTOM = -4.0f;               // lowest possible y - at result 0
     const float Y_RANGE = 8.0f;                 // should be -2 * Y_BOTTOM
+
+    // terrain
+    const int TERRAIN_SIZE = 512;
+    const int TERRAIN_TEXTURE_STEP = 32;
+    const char * const TERRAIN_TEXTURE_DIFFUSE = R"(../resources/grass.jpg)";
+    const char * const TERRAIN_TEXTURE_SPECULAR = R"(../resources/grass.jpg)";
 }
 
 // namespace storing rendering-related variables

@@ -13,19 +13,15 @@
 #include <string>
 #include <glm/glm.hpp>
 
-// TODO this is stupid, change it
-struct Object {
-    unsigned int id = 0;
-    std::string name;
-    float * vertices = nullptr;
-    float * indices = nullptr;
-    float * colors = nullptr;
-    std::string textureName;
-    float * textureIndices = nullptr;
-    bool placed = false;
-    glm::vec3 position;
-    glm::vec3 scale;
-    glm::vec3 rotation;
+// we check what's loaded into the mesh using bit operators
+#define MESH_TYPE_VERTEX 1
+#define MESH_TYPE_NORMAL 2
+#define MESH_TYPE_TEXTURE 4
+
+struct Mesh {
+    unsigned int type;
+    float * data = nullptr;
+    GLuint program;
 };
 
 struct Material {
