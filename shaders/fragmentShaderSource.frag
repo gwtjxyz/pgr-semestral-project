@@ -53,7 +53,7 @@ in vec3 FragPos;
 in vec2 TexCoords;
 in vec3 Normal;
 in vec3 viewPos;
-in vec3 fogCenter;
+uniform vec3 fogCenter;
 
 out vec4 FragColor;
 
@@ -139,11 +139,11 @@ vec3 CombineLight(vec3 ambient, vec3 diffuse, vec3 specular, float diff, float s
 // TODO make this take in uniforms
 vec3 CalcFogColor(vec3 shadedColor) {
     // parameters
-    float fogMaxDist = 20.0;
-    float fogMinDist = 10.0;
+    float fogMaxDist = 80.0;
+    float fogMinDist = 20.0;
 //    float fogColor = max(max(dirLight.ambient.x, dirLight.ambient.y), dirLight.ambient.z);
-    float fogColor = 0.4;
-    vec3 fogColorVec = vec3(fogColor, fogColor, fogColor);
+
+    vec3 fogColorVec = vec3(0.4, 0.4, 0.45);
 
     // calculate fog
     float dist = length(fogCenter - FragPos);

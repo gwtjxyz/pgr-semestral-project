@@ -59,6 +59,7 @@ bool init() {
 
     gl::programId = glCreateProgram();
     gl::lightingId = glCreateProgram();
+    gl::skyboxId = glCreateProgram();
 //    setActiveProgram(gl::programId);
 
     // create and set active camera

@@ -3,13 +3,36 @@
 #include <string>
 
 #include "utils.h"
-
+#include "windowing.h"
 
 glm::mat4 Render::projection() {
     return glm::perspective(glm::radians(Config::FOV),
                             (float) Config::WINDOW_WIDTH / (float) Config::WINDOW_HEIGHT,
                             Config::ZNEAR,
                             Config::ZFAR);
+}
+
+void loadMainShaders() {
+    program.activeId = gl::programId;
+//    setActiveProgram(gl::programId);
+    createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderSource.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderSource.frag)");
+    glUseProgram(program.activeId);
+}
+
+void loadLightSourceShaders() {
+//    setActiveProgram(gl::lightingId);
+    program.activeId = gl::lightingId;
+    createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderLightSrc.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderLightSrc.frag)");
+    glUseProgram(program.activeId);
+}
+
+void loadSkyboxShaders() {
+    program.activeId = gl::skyboxId;
+    createShader(GL_VERTEX_SHADER, R"(../shaders/skybox.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/skybox.frag)");
+    glUseProgram(program.activeId);
 }
 
 void renderDirectionalLight(const char * varName,
@@ -85,4 +108,17 @@ void renderTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & vi
 
     glEnableVertexAttribArray(0);
     glDrawElements(GL_TRIANGLES, terrain.nrTriangles * 3, GL_UNSIGNED_INT, 0);
+}
+
+void renderSkybox(Skybox & skybox) {
+    glDepthMask(GL_FALSE);
+    setActiveProgram(gl::skyboxId);
+    glm::mat4 proj = Render::projection();
+    glm::mat4 view = glm::mat4(glm::mat3(program.activeCamera.getViewMatrix()));
+    setUniformMat4("projection", proj);
+    setUniformMat4("view", view);
+    glBindVertexArray(skybox.VAO);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.texture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDepthMask(GL_TRUE);
 }

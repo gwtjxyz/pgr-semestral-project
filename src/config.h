@@ -47,6 +47,7 @@ namespace Config {
 namespace gl {
     extern GLuint programId;
     extern GLuint lightingId;
+    extern GLuint skyboxId;
     extern GLFWwindow * mainWindow;
     extern float deltaTime;
     extern float lastFrame;

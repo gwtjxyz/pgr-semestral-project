@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstring>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -11,25 +10,9 @@
 #include "utils.h"
 #include "render.h"
 #include "world/terrain.h"
-//#include "objects/common.h"
+#include "objects/objects.h"
 
 // loads shaders from files and links them into the program
-
-void loadMainShaders() {
-    program.activeId = gl::programId;
-//    setActiveProgram(gl::programId);
-    createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderSource.vert)");
-    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderSource.frag)");
-    glUseProgram(program.activeId);
-}
-
-void loadLightSourceShaders() {
-//    setActiveProgram(gl::lightingId);
-    program.activeId = gl::lightingId;
-    createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderLightSrc.vert)");
-    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderLightSrc.frag)");
-    glUseProgram(program.activeId);
-}
 
 void drawTenCubes(const glm::mat4 & proj, const glm::mat4 & view, const glm::vec3 * cubePositions) {
 
@@ -45,6 +28,11 @@ void drawTenCubes(const glm::mat4 & proj, const glm::mat4 & view, const glm::vec
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+}
+
+void drawFog() {
+    glm::vec3 fogCenter = program.activeCamera.mPosition;
+    setUniform3f("fogCenter", fogCenter);
 }
 
 int main() {
@@ -119,7 +107,8 @@ int main() {
             glm::vec3( 0.0f,  0.0f, -3.0f)
     };
 
-    // load shaderinos
+    // ==============================================================
+    // main scene
     loadMainShaders();
 
     setActiveProgram(gl::programId);
@@ -152,6 +141,13 @@ int main() {
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
+    // ================================================================
+    // skybox
+    stbi_set_flip_vertically_on_load(false);
+    Skybox skybox = loadSkybox();
+    stbi_set_flip_vertically_on_load(true);
+
+    // ================================================================
     // lighting - light source creation
     loadLightSourceShaders();
 
@@ -191,6 +187,7 @@ int main() {
         // render
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderSkybox(skybox);
 
         // set up PVM
         glm::mat4 proj = Render::projection();
@@ -223,10 +220,7 @@ int main() {
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
         glm::vec3 ambientColor = lightColor * glm::vec3(0.2f);
 
-        setUniform3f("viewPos", program.activeCamera.mPosition);
-//        glm::vec3 fogCenter = program.activeCamera.mPosition;
-//        fogCenter = fogCenter * glm::mat3(PVM);
-//        setUniform3f("fogCenter", fogCenter);
+        drawFog();
 
         // directional light
         renderDirectionalLight("dirLight",

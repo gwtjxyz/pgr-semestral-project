@@ -11,24 +11,32 @@
 */
 //----------------------------------------------------------------------------------------
 #include <string>
+
 #include <glm/glm.hpp>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 // we check what's loaded into the mesh using bit operators
 #define MESH_TYPE_VERTEX 1
 #define MESH_TYPE_NORMAL 2
 #define MESH_TYPE_TEXTURE 4
 
-struct Mesh {
-    unsigned int type;
-    float * data = nullptr;
-    GLuint program;
-};
-
 struct Material {
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
     float shininess;
+};
+
+struct Vertex {
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec3 texCoords;
+};
+
+struct Texture {
+    GLuint id;
+    std::string type;
 };
 
 enum class LightType {

@@ -3,6 +3,7 @@
 #include <string>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <vector>
 
 #include "config.h"
 
@@ -33,5 +34,7 @@ GLuint loadTexture2D(const char * path);
 // The texture format is set manually by the user.
 // Uses GL_REPEAT, linear mipmapping by default.
 GLuint loadTexture2D(const char * path, GLenum format);
+
+GLuint loadCubemap(std::vector<std::string> faces);
 
 void loadMaterials();

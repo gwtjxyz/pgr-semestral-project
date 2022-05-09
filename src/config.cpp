@@ -28,6 +28,7 @@ namespace Config {
 namespace gl {
     GLuint programId = 0;
     GLuint lightingId = 0;
+    GLuint skyboxId = 0;
     GLFWwindow * mainWindow = nullptr;
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
