@@ -214,6 +214,9 @@ int main() {
 //=============================================================================
         // render cubes
         setActiveProgram(gl::programId);
+        setUniform1i("warp.flagWarp", program.enableWarp);
+        setUniform1i("flagSpotlight", program.enableSpotlight);
+        setUniform1f("warp.warpBy", (float) sin(glfwGetTime()));
 
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 //        lightColor.x = sin(glfwGetTime() * 2.0f);
@@ -233,7 +236,7 @@ int main() {
                                {0.5f, 0.5f, 0.5f});
 
         // point lights
-        for (int i = 0; i != 4; ++i) {
+        for (int i = 0; i != 3; ++i) {
             std::string destination = "pointLights[";
             destination.append(std::to_string(i)).append("]");
             renderPointLight(destination.c_str(),
@@ -245,6 +248,15 @@ int main() {
                              0.09f,
                              0.032f);
         }
+        std::string destination = "pointLights[3]";
+        renderPointLight(destination.c_str(),
+                         lightPos,
+                         {sin(glfwGetTime() * 0.7f), sin(glfwGetTime()) * 0.05f, sin(glfwGetTime()) * 0.15f},
+                         {sin(glfwGetTime()) * 0.6f, sin(glfwGetTime()) * 2.0f, sin(glfwGetTime()) * 1.4f},
+                         {1.0f, 1.0f, 1.0f},
+                         1.0f,
+                         0.14f,
+                         0.07f);
 
         // spot light
         renderSpotlight("spotlight",

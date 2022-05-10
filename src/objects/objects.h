@@ -9,6 +9,7 @@ struct Skybox {
     GLuint VAO;
     GLuint VBO;
     GLuint texture;
+    GLuint cloudsTexture;
 };
 
 Skybox loadSkybox();

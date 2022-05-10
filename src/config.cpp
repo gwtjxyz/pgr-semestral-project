@@ -18,6 +18,7 @@ namespace Config {
     int WINDOW_WIDTH = 800;
     int WINDOW_HEIGHT = 600;
     bool ENABLE_DEBUG = false;
+    bool ENABLE_FULLSCREEN = false;
     float FOV = 59.0f;          // vertical FOV - equal to 90° horizontal FOV
     float ZNEAR = 0.1f;
     float ZFAR = 100.0f;

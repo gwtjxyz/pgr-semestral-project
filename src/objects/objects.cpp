@@ -64,6 +64,7 @@ Skybox loadSkybox() {
             R"(../resources/skybox/day/back.jpg)"
     };
     skybox.texture = loadCubemap(skyboxFaces);
+    skybox.cloudsTexture = loadTexture2D(R"(../resources/clouds.jpg)");
 
     glGenVertexArrays(1, &skybox.VAO);
     glGenBuffers(1, &skybox.VBO);

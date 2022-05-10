@@ -19,6 +19,10 @@ void setUniform3f(const char * property, const glm::vec3 & in);
 
 void setUniform3f(const char * property, const float & x, const float & y, const float & z);
 
+void setUniform2f(const char * property, const glm::vec2 & in);
+
+void setUniform2f(const char * property, const float & x, const float & y);
+
 void setUniform1i(const char * property, const int & in);
 
 void setUniform1f(const char * property, const float & f);

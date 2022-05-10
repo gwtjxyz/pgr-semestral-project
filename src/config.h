@@ -17,6 +17,7 @@ namespace Config {
     extern int WINDOW_HEIGHT;
 
     extern bool ENABLE_DEBUG;
+    extern bool ENABLE_FULLSCREEN;
 
     extern float FOV;          // vertical FOV - equal to 90° horizontal FOV
     extern float ZNEAR;
@@ -28,6 +29,7 @@ namespace Config {
     const float SPEED = 2.5f;
     const float SENSITIVITY = 0.1f;
     const float ZOOM = 45.0f;
+    const float SCENE_BOUNDS = 50.0f;
 
     // Perlin noise - for terrain generation
     const float Z_CONSTANT = 0.8f;
@@ -40,6 +42,7 @@ namespace Config {
     const int TERRAIN_TEXTURE_STEP = 32;
     const char * const TERRAIN_TEXTURE_DIFFUSE = R"(../resources/grass.jpg)";
     const char * const TERRAIN_TEXTURE_SPECULAR = R"(../resources/grass.jpg)";
+    const float TERRAIN_Y = -6.0f;
 
     // models
     const std::string TEXTURE_DIFFUSE = "diffuse";
@@ -58,5 +61,4 @@ namespace gl {
     extern bool firstMouse;
     extern float lastX;
     extern float lastY;
-    extern std::map<MaterialType, Material> materials;
 }

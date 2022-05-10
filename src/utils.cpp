@@ -97,6 +97,14 @@ void setUniform3f(const char * property, const float & x, const float & y, const
     glUniform3f(glGetUniformLocation(program.activeId, property), x, y, z);
 }
 
+void setUniform2f(const char * property, const glm::vec2 & vec) {
+    glUniform2f(glGetUniformLocation(program.activeId, property), vec.x, vec.y);
+}
+
+void setUniform2f(const char * property, const float & x, const float & y) {
+    glUniform2f(glGetUniformLocation(program.activeId, property), x, y);
+}
+
 void setUniform1i(const char * property, const int & in) {
     glUniform1i(glGetUniformLocation(program.activeId, property), in);
 }

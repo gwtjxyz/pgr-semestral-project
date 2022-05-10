@@ -10,6 +10,8 @@
 struct Program {
     Camera activeCamera;
     GLuint activeId;
+    int enableWarp = 0;
+    int enableSpotlight = 0;
 };
 
 extern Program program;

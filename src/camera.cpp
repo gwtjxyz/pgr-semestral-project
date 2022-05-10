@@ -66,6 +66,24 @@ void Camera::processKeyboard(CameraDirections direction, float deltaTime) {
         mPosition -= mRight * velocity;
     if (direction == CameraDirections::RIGHT)
         mPosition += mRight * velocity;
+
+    // space constraints
+    if (mPosition.y <= Config::TERRAIN_Y + 1.0f)
+        mPosition.y = Config::TERRAIN_Y + 1.0f;
+    if (mPosition.y >= Config::SCENE_BOUNDS)
+        mPosition.y = Config::SCENE_BOUNDS;
+
+
+    if (mPosition.x >= Config::SCENE_BOUNDS)
+        mPosition.x = Config::SCENE_BOUNDS;
+    if (mPosition.x <= -Config::SCENE_BOUNDS)
+        mPosition.x = -Config::SCENE_BOUNDS;
+
+    if (mPosition.z >= Config::SCENE_BOUNDS)
+        mPosition.z = Config::SCENE_BOUNDS;
+    if (mPosition.z <= -Config::SCENE_BOUNDS)
+        mPosition.z = -Config::SCENE_BOUNDS;
+
 }
 
 void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch) {

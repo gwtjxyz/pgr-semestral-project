@@ -100,7 +100,11 @@ void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view
     glBindVertexArray(terrain.VAO);
     // move terrain to be centered around [0,0,0]
     glm::mat4 terrainModel = glm::mat4(1.0f);
-    terrainModel = glm::translate(terrainModel, {-((float) terrain.size / 4), -6.0f, -((float) terrain.size / 4)});
+    terrainModel = glm::translate(terrainModel,
+                                  {-((float) terrain.size / 4),
+                                   Config::TERRAIN_Y,
+                                   -((float) terrain.size / 4)});
+
     glm::mat4 PVM = proj * view * terrainModel;
 
     setUniformMat4("PVM", PVM);
@@ -117,8 +121,12 @@ void drawSkybox(Skybox & skybox) {
     glm::mat4 view = glm::mat4(glm::mat3(program.activeCamera.getViewMatrix()));
     setUniformMat4("projection", proj);
     setUniformMat4("view", view);
+    setUniform1i("clouds", skybox.cloudsTexture);
+//    setUniform2f("CloudCoords", 0.0f, 1.0f);
     glBindVertexArray(skybox.VAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.texture);
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_2D,  skybox.cloudsTexture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
 }

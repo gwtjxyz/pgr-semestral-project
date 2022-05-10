@@ -56,6 +56,7 @@ in vec3 FragPos;
 in vec2 TexCoords;
 in vec3 Normal;
 in vec3 viewPos;
+uniform int flagSpotlight;
 uniform vec3 fogCenter;
 
 out vec4 FragColor;
@@ -80,7 +81,8 @@ void main() {
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
     }
     // spot light
-    result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
+    if (flagSpotlight == 1)
+        result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
 
     vec3 resultWithFog = CalcFogColor(result);
 

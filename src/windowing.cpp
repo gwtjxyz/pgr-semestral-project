@@ -75,23 +75,26 @@ void framebufferSizeCallback(GLFWwindow * window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+// TODO
+void switchResolutions() {
+//    const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+//    if ()
+}
+
 void processInput(GLFWwindow * window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         program.activeCamera.processKeyboard(CameraDirections::FORWARD, gl::deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         program.activeCamera.processKeyboard(CameraDirections::BACKWARD, gl::deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
         program.activeCamera.processKeyboard(CameraDirections::LEFT, gl::deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         program.activeCamera.processKeyboard(CameraDirections::RIGHT, gl::deltaTime);
-//    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-//        Config::ENABLE_DEBUG = !Config::ENABLE_DEBUG;
 
-//    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-//        std::cout << "Camera values:\tYaw = " << program.activeCamera.mYaw << " |\tPitch = " << program.activeCamera.mPitch << std::endl;
+    switchResolutions();
 }
 
 void mouseCallback(GLFWwindow * window, double xPosIn, double yPosIn) {
@@ -123,8 +126,25 @@ void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, in
     else
         program.activeCamera.mIsSprinting = false;
 
+    if (mods & GLFW_MOD_ALT)
+        glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
-        Config::ENABLE_DEBUG = ! Config::ENABLE_DEBUG;
+        Config::ENABLE_DEBUG = !Config::ENABLE_DEBUG;
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+        program.enableWarp = !program.enableWarp;
+    if (key == GLFW_KEY_E && action == GLFW_PRESS)
+        program.enableSpotlight = !program.enableSpotlight;
+
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
+        Config::ENABLE_FULLSCREEN = !Config::ENABLE_FULLSCREEN;
+}
+
+void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+
 }
 
 void setCallbacks() {
@@ -132,6 +152,7 @@ void setCallbacks() {
     glfwSetCursorPosCallback(gl::mainWindow, mouseCallback);
     glfwSetScrollCallback(gl::mainWindow, scrollCallback);
     glfwSetKeyCallback(gl::mainWindow, keyboardCallback);
+    glfwSetMouseButtonCallback(gl::mainWindow, mouseButtonCallback);
     // tell GLFW to capture our mouse
     glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
