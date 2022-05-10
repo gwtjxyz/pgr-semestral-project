@@ -45,7 +45,10 @@ struct Spotlight {
 #define NR_POINT_LIGHTS 4
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 
-uniform Material material;
+#define NR_MATERIALS 3
+
+// TODO handle multiple materials properly
+uniform Material materials[NR_MATERIALS];
 uniform DirLight dirLight;
 uniform Spotlight spotlight;
 
@@ -90,7 +93,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), materials[0].shininess);
     // combine results
     vec3 result = CombineLight(light.ambient, light.diffuse, light.specular, diff, spec);
     return result;
@@ -102,7 +105,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), materials[0].shininess);
     // attenuation
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
@@ -122,7 +125,7 @@ vec3 CalcSpotLight(Spotlight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
     float diff = max(dot(normal, lightDir), 0.0);
     // specular
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), materials[0].shininess);
     // combine results
     vec3 result = CombineLight(light.ambient, light.diffuse, light.specular, diff, spec);
     result *= intensity;
@@ -130,9 +133,9 @@ vec3 CalcSpotLight(Spotlight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
 }
 
 vec3 CombineLight(vec3 ambient, vec3 diffuse, vec3 specular, float diff, float spec) {
-    vec3 newAmbient  = ambient  * vec3(texture(material.diffuse, TexCoords));
-    vec3 newDiffuse  = diffuse  * diff * vec3(texture(material.diffuse, TexCoords));
-    vec3 newSpecular = specular * spec * vec3(texture(material.specular, TexCoords));
+    vec3 newAmbient  = ambient  * vec3(texture(materials[0].diffuse, TexCoords));
+    vec3 newDiffuse  = diffuse  * diff * vec3(texture(materials[0].diffuse, TexCoords));
+    vec3 newSpecular = specular * spec * vec3(texture(materials[0].specular, TexCoords));
     return newAmbient + newDiffuse + newSpecular;
 }
 

@@ -63,6 +63,10 @@ void renderSpotlight(const char * varName,
                      float outerCutoff);
 
 // TODO
-void renderTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view);
+void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view);
 
-void renderSkybox(Skybox & skybox);
+void drawSkybox(Skybox & skybox);
+
+void drawBackpack(Model & backpack);
+
+void drawTower(Model & tower);

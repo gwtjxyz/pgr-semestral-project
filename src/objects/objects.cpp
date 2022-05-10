@@ -77,3 +77,8 @@ Skybox loadSkybox() {
 
     return skybox;
 }
+
+Model loadBackpack() {
+    Model backpackModel(R"(../resources/models/backpack/backpack.obj)");
+    return backpackModel;
+}

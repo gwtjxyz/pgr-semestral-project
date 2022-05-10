@@ -40,6 +40,10 @@ namespace Config {
     const int TERRAIN_TEXTURE_STEP = 32;
     const char * const TERRAIN_TEXTURE_DIFFUSE = R"(../resources/grass.jpg)";
     const char * const TERRAIN_TEXTURE_SPECULAR = R"(../resources/grass.jpg)";
+
+    // models
+    const std::string TEXTURE_DIFFUSE = "diffuse";
+    const std::string TEXTURE_SPECULAR = "specular";
 }
 
 // namespace storing rendering-related variables

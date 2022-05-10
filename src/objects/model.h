@@ -20,6 +20,7 @@ private:
                                               aiTextureType type,
                                               std::string typeName);
 private:
+    std::vector<Texture> mLoadedTextures;
     std::vector<ImportedMesh> mMeshes;
     std::string mDirectory;
 };

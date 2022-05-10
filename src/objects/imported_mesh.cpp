@@ -59,12 +59,12 @@ void ImportedMesh::draw(GLuint shaderId) {
 
         std::string number;
         std::string name = mTextures[i].type;
-        if (name == "texture_diffuse")
+        if (name == Config::TEXTURE_DIFFUSE)
             number = std::to_string(diffuseNr++);
-        else if (name == "texture_specular")
+        else if (name == Config::TEXTURE_SPECULAR)
             number = std::to_string(specularNr++);
 
-        setUniform1f(("material." + name + number).c_str(), i);
+        setUniform1f(("materials[" + number + "]" + name).c_str(), i);
         glBindTexture(GL_TEXTURE_2D, mTextures[i].id);
     }
     glActiveTexture(GL_TEXTURE0);

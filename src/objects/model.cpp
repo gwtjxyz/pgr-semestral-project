@@ -75,11 +75,11 @@ ImportedMesh Model::processMesh(aiMesh * mesh, const aiScene * scene) {
         aiMaterial * material = scene->mMaterials[mesh->mMaterialIndex];
         std::vector<Texture> diffuseMaps = loadMaterialTextures(material,
                                                                 aiTextureType_DIFFUSE,
-                                                                "texture_diffuse");
+                                                                Config::TEXTURE_DIFFUSE);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         std::vector<Texture> specularMaps = loadMaterialTextures(material,
                                                                  aiTextureType_SPECULAR,
-                                                                 "texture_specular");
+                                                                 Config::TEXTURE_SPECULAR);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
 
@@ -91,11 +91,22 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType
     for (unsigned int i = 0; i != mat->GetTextureCount(type); ++i) {
         aiString str;
         mat->GetTexture(type, i, &str);
-        Texture texture;
-        texture.id = loadTextureFromFile(str.C_Str(), mDirectory);
-        texture.type = typeName;
-        texture.path = str.C_Str();
-        textures.push_back(texture);
+        bool skip = false;
+        for (int j = 0; j < mLoadedTextures.size(); ++j) {
+            if (std::strcmp(mLoadedTextures[j].path.data(), str.C_Str()) == 0) {
+                textures.push_back(mLoadedTextures[j]);
+                skip = true;
+                break;
+            }
+        }
+        if (!skip) {    // don't load textures that have already been loaded
+            Texture texture;
+            texture.id = loadTextureFromFile(str.C_Str(), mDirectory);
+            texture.type = typeName;
+            texture.path = str.C_Str();
+            textures.push_back(texture);
+            mLoadedTextures.push_back(texture); // add to loaded textures
+        }
     }
     return textures;
 }

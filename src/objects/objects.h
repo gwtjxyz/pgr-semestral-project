@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "model.h"
+
 struct Skybox {
     GLuint VAO;
     GLuint VBO;
@@ -10,3 +12,5 @@ struct Skybox {
 };
 
 Skybox loadSkybox();
+
+Model loadBackpack();

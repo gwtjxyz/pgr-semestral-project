@@ -90,7 +90,7 @@ void renderSpotlight(const char * varName,
 
 }
 
-void renderTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view) {
+void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view) {
     // set up textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, terrain.diffuse);
@@ -110,7 +110,7 @@ void renderTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & vi
     glDrawElements(GL_TRIANGLES, terrain.nrTriangles * 3, GL_UNSIGNED_INT, 0);
 }
 
-void renderSkybox(Skybox & skybox) {
+void drawSkybox(Skybox & skybox) {
     glDepthMask(GL_FALSE);
     setActiveProgram(gl::skyboxId);
     glm::mat4 proj = Render::projection();
@@ -121,4 +121,25 @@ void renderSkybox(Skybox & skybox) {
     glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.texture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
+}
+
+void drawBackpack(Model & backpack) {
+
+}
+
+void drawTower(Model & tower) {
+
+    glm::mat4 proj, view, model, PVM;
+    proj = Render::projection();
+    view = program.activeCamera.getViewMatrix();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-15.0f, 2.0f, -15.0f));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(-110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+    PVM = proj * view * model;
+    setUniform1f("materials[0].shininess", 4.0f);
+    setUniformMat4("model", model);
+    setUniformMat4("PVM", PVM);
+    tower.draw(gl::programId);
 }

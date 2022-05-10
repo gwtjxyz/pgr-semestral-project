@@ -112,10 +112,10 @@ int main() {
     loadMainShaders();
 
     setActiveProgram(gl::programId);
-    setUniform1i("material.diffuse", 0);
-    setUniform1i("material.specular", 1);
+    setUniform1i("materials[0].diffuse", 0);
+    setUniform1i("materials[0].specular", 1);
 //    setUniform3f("material.specular", 0.5f, 0.5f, 0.5f);
-    setUniform1f("material.shininess", 32.0f);
+    setUniform1f("materials[0].shininess", 32.0f);
 
     GLuint cubeVAO, VBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -138,6 +138,9 @@ int main() {
     stbi_set_flip_vertically_on_load(true);
     GLuint diffuseMap = loadTexture2D(R"(../resources/container2.png)");
     GLuint specularMap = loadTexture2D(R"(../resources/container2_specular.png)");
+
+    Model backpackModel(R"(../resources/models/backpack/backpack.obj)");
+    Model towerModel(R"(../resources/models/tower/scene.gltf)");
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
@@ -187,7 +190,7 @@ int main() {
         // render
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderSkybox(skybox);
+        drawSkybox(skybox);
 
         // set up PVM
         glm::mat4 proj = Render::projection();
@@ -265,8 +268,18 @@ int main() {
         glBindVertexArray(cubeVAO);
         drawTenCubes(proj, view, cubePositions);
 
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        PVM = proj * view * model;
+        setUniformMat4("model", model);
+        setUniformMat4("PVM", PVM);
+        backpackModel.draw(gl::programId);
+
+        drawTower(towerModel);
+
         // terrain (please work)
-        renderTerrain(terrain, proj, view);
+        drawTerrain(terrain, proj, view);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(gl::mainWindow);
