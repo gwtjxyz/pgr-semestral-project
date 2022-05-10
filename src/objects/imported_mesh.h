@@ -10,6 +10,7 @@ public:
     ImportedMesh(std::vector<Vertex> vetices,
                  std::vector<GLuint> indices,
                  std::vector<Texture> textures);
+    void draw(GLuint shaderId);
 private:
     void setupMesh();
 public:

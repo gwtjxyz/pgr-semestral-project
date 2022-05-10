@@ -87,8 +87,8 @@ void processInput(GLFWwindow * window) {
         program.activeCamera.processKeyboard(CameraDirections::LEFT, gl::deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         program.activeCamera.processKeyboard(CameraDirections::RIGHT, gl::deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-        Config::ENABLE_DEBUG = !Config::ENABLE_DEBUG;
+//    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+//        Config::ENABLE_DEBUG = !Config::ENABLE_DEBUG;
 
 //    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 //        std::cout << "Camera values:\tYaw = " << program.activeCamera.mYaw << " |\tPitch = " << program.activeCamera.mPitch << std::endl;
@@ -122,6 +122,9 @@ void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, in
         program.activeCamera.mIsSprinting = true;
     else
         program.activeCamera.mIsSprinting = false;
+
+    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+        Config::ENABLE_DEBUG = ! Config::ENABLE_DEBUG;
 }
 
 void setCallbacks() {

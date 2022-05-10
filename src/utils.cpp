@@ -165,6 +165,14 @@ GLuint loadTexture2D(const char * path, GLenum format) {
     return texture;
 }
 
+GLuint loadTextureFromFile(const char * path, const std::string & directory, bool gamma) {
+    std::string filename = std::string(path);
+    filename = directory + '/' + filename;
+
+    GLuint textureId = loadTexture2D(filename.c_str());
+    return textureId;
+}
+
 GLuint loadCubemap(std::vector<std::string> faces) {
     GLuint textureId;
     glGenTextures(1, &textureId);

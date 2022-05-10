@@ -2,6 +2,9 @@
 
 #include <utility>
 
+#include "windowing.h"
+#include "utils.h"
+
 ImportedMesh::ImportedMesh(std::vector<Vertex> vertices,
                            std::vector<GLuint> indices,
                            std::vector<Texture> textures) {
@@ -44,5 +47,30 @@ void ImportedMesh::setupMesh() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
                           sizeof(Vertex), (void *) offsetof(Vertex, texCoords));
 
+    glBindVertexArray(0);
+}
+
+void ImportedMesh::draw(GLuint shaderId) {
+    setActiveProgram(shaderId);
+    GLuint diffuseNr = 1;
+    GLuint specularNr = 1;
+    for (unsigned int i = 0; i != mTextures.size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i);
+
+        std::string number;
+        std::string name = mTextures[i].type;
+        if (name == "texture_diffuse")
+            number = std::to_string(diffuseNr++);
+        else if (name == "texture_specular")
+            number = std::to_string(specularNr++);
+
+        setUniform1f(("material." + name + number).c_str(), i);
+        glBindTexture(GL_TEXTURE_2D, mTextures[i].id);
+    }
+    glActiveTexture(GL_TEXTURE0);
+
+    // draw mesh
+    glBindVertexArray(mVAO);
+    glDrawElements(GL_TRIANGLES, mIndices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

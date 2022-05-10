@@ -35,6 +35,8 @@ GLuint loadTexture2D(const char * path);
 // Uses GL_REPEAT, linear mipmapping by default.
 GLuint loadTexture2D(const char * path, GLenum format);
 
+GLuint loadTextureFromFile(const char * path, const std::string & directory, bool gamma = false);
+
 GLuint loadCubemap(std::vector<std::string> faces);
 
 void loadMaterials();
