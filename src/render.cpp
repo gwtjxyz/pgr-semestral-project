@@ -35,6 +35,13 @@ void loadSkyboxShaders() {
     glUseProgram(program.activeId);
 }
 
+void loadLogoShaders() {
+    program.activeId = gl::logoId;
+    createShader(GL_VERTEX_SHADER, R"(../shaders/logoShader.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/logoShader.frag)");
+    glUseProgram(program.activeId);
+}
+
 void renderDirectionalLight(const char * varName,
                             glm::vec3 direction,
                             glm::vec3 ambient,
@@ -125,8 +132,8 @@ void drawSkybox(Skybox & skybox) {
 //    setUniform2f("CloudCoords", 0.0f, 1.0f);
     glBindVertexArray(skybox.VAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.texture);
-    glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D,  skybox.cloudsTexture);
+//    glActiveTexture(GL_TEXTURE6);
+//    glBindTexture(GL_TEXTURE_2D,  skybox.cloudsTexture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
 }
@@ -136,7 +143,6 @@ void drawBackpack(Model & backpack) {
 }
 
 void drawTower(Model & tower) {
-
     glm::mat4 proj, view, model, PVM;
     proj = Render::projection();
     view = program.activeCamera.getViewMatrix();
@@ -150,4 +156,45 @@ void drawTower(Model & tower) {
     setUniformMat4("model", model);
     setUniformMat4("PVM", PVM);
     tower.draw(gl::programId);
+}
+
+void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj) {
+    if (!gl::logoEnabled) {
+        return;
+    }
+
+    setActiveProgram(gl::logoId);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glDisable(GL_DEPTH_TEST);
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(2.0f));
+    model = glm::translate(model, logo.position);
+
+    // we want to use orthogonal matrices since it's an overlay
+    glm::mat4 orthoProj = glm::ortho(
+            -1.0f,1.0f,
+            -1.0f, 1.0f,
+            -10.0f, 10.0f
+    );
+    glm::mat4 orthoView = glm::lookAt(
+            glm::vec3(0.0f, 0.0f, 1.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f)
+    );
+
+    glm::mat4 PVM = orthoProj * orthoView * model;
+    setUniformMat4("PVM", PVM);
+    setUniform1i("texSampler", 0);
+    setUniform1f("time", gl::logoTime);
+    glBindVertexArray(logo.VAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, logo.texture);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    gl::logoTime += gl::deltaTime;
+
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
 }

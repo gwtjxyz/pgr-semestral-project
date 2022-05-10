@@ -55,10 +55,13 @@ namespace gl {
     extern GLuint programId;
     extern GLuint lightingId;
     extern GLuint skyboxId;
+    extern GLuint logoId;
     extern GLFWwindow * mainWindow;
     extern float deltaTime;
     extern float lastFrame;
     extern bool firstMouse;
     extern float lastX;
     extern float lastY;
+    extern bool logoEnabled;
+    extern float logoTime;
 }

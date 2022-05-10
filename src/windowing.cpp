@@ -60,6 +60,7 @@ bool init() {
     gl::programId = glCreateProgram();
     gl::lightingId = glCreateProgram();
     gl::skyboxId = glCreateProgram();
+    gl::logoId = glCreateProgram();
 //    setActiveProgram(gl::programId);
 
     // create and set active camera
@@ -136,8 +137,11 @@ void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, in
     if (key == GLFW_KEY_E && action == GLFW_PRESS)
         program.enableSpotlight = !program.enableSpotlight;
 
-    if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
-        Config::ENABLE_FULLSCREEN = !Config::ENABLE_FULLSCREEN;
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
+        gl::logoEnabled = !gl::logoEnabled;
+        if (gl::logoEnabled)
+            gl::logoTime = 0.0f;    // reset every time we turn it on
+    }
 }
 
 void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods) {

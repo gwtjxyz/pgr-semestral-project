@@ -83,3 +83,31 @@ Model loadBackpack() {
     Model backpackModel(R"(../resources/models/backpack/backpack.obj)");
     return backpackModel;
 }
+
+Image loadLogo() {
+    Image logo{};
+    float logoVertices[] = {
+            -1.0f,  0.15f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -0.15f, 0.0f, 0.0f, 0.0f,
+            1.0f,  0.15f, 0.0f, 3.0f, 1.0f,
+            1.0f, -0.15f, 0.0f, 3.0f, 0.0f
+    };
+
+    logo.texture = loadTexture2D(R"(../resources/opengl-logo.png)");
+
+    glGenVertexArrays(1, &logo.VAO);
+    glGenBuffers(1, &logo.VBO);
+
+    glBindVertexArray(logo.VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, logo.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(logoVertices), logoVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    logo.position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    return logo;
+}

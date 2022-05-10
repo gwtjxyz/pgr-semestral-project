@@ -30,10 +30,13 @@ namespace gl {
     GLuint programId = 0;
     GLuint lightingId = 0;
     GLuint skyboxId = 0;
+    GLuint logoId = 0;
     GLFWwindow * mainWindow = nullptr;
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
     bool firstMouse = true;
     float lastX = Config::WINDOW_WIDTH / 2.0f;
     float lastY = Config::WINDOW_HEIGHT / 2.0f;
+    bool logoEnabled = false;
+    float logoTime = 0.0f;
 }

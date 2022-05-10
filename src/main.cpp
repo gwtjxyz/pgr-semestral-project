@@ -165,12 +165,13 @@ int main() {
 
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
+    // ==============================================================
+    // logo
+    loadLogoShaders();
+    Image logo = loadLogo();
 
-    // wireframes
-    // TODO add this as some debugging feature
 
     // main loop
-    // TODO add proper input processing
     while (!glfwWindowShouldClose(gl::mainWindow)) {
 
         // per-frame time logic
@@ -292,6 +293,10 @@ int main() {
 
         // terrain (please work)
         drawTerrain(terrain, proj, view);
+
+        // logo
+
+        drawLogo(logo, view, proj);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(gl::mainWindow);

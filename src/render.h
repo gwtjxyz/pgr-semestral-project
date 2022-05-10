@@ -62,7 +62,8 @@ void renderSpotlight(const char * varName,
                      float cutoff,
                      float outerCutoff);
 
-// TODO
+void loadLogoShaders();
+
 void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view);
 
 void drawSkybox(Skybox & skybox);
@@ -70,3 +71,5 @@ void drawSkybox(Skybox & skybox);
 void drawBackpack(Model & backpack);
 
 void drawTower(Model & tower);
+
+void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj);
