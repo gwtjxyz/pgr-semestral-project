@@ -141,6 +141,7 @@ int main() {
 
     Model backpackModel(R"(../resources/models/backpack/backpack.obj)");
     Model towerModel(R"(../resources/models/tower/scene.gltf)");
+    Model swordModel(R"(../resources/models/sword/Sting.obj)");
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
@@ -217,6 +218,7 @@ int main() {
         setActiveProgram(gl::programId);
         setUniform1i("warp.flagWarp", program.enableWarp);
         setUniform1i("flagSpotlight", program.enableSpotlight);
+        setUniform3f("viewPos", program.activeCamera.mPosition);
         setUniform1f("warp.warpBy", (float) sin(glfwGetTime()));
 
         glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
@@ -290,6 +292,8 @@ int main() {
         backpackModel.draw(gl::programId);
 
         drawTower(towerModel);
+
+        drawSword(swordModel);
 
         // terrain (please work)
         drawTerrain(terrain, proj, view);

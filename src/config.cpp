@@ -39,4 +39,5 @@ namespace gl {
     float lastY = Config::WINDOW_HEIGHT / 2.0f;
     bool logoEnabled = false;
     float logoTime = 0.0f;
+    bool enableMovement = true;
 }

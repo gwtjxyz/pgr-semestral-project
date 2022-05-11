@@ -198,3 +198,22 @@ void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj) {
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 }
+
+void drawSword(Model & sword) {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glm::mat4 proj, view, model, PVM;
+    proj = Render::projection();
+    view = program.activeCamera.getViewMatrix();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(5.0f, 2.0f, 10.0f));
+//    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+//    model = glm::rotate(model, glm::radians(-110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+    PVM = proj * view * model;
+//    setUniform1f("materials[0].shininess", 4.0f);
+    setUniformMat4("model", model);
+    setUniformMat4("PVM", PVM);
+    sword.draw(gl::programId);
+    glDisable(GL_BLEND);
+}

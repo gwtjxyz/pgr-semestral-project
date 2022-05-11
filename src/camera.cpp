@@ -13,7 +13,6 @@
 #include <glm/detail/type_quat.hpp>
 #include <iostream>
 
-// TODO maybe make this into a quaternion camera so it actually works properly
 Camera::Camera(glm::vec3 position,
                glm::vec3 up,
                float yaw,
@@ -52,6 +51,9 @@ glm::mat4 Camera::getViewMatrix() {
 }
 
 void Camera::processKeyboard(CameraDirections direction, float deltaTime) {
+    if (!gl::enableMovement)
+        return;
+
     float velocity;
     if (mIsSprinting)
         velocity = mMovementSpeed * 4 * deltaTime;
@@ -87,6 +89,9 @@ void Camera::processKeyboard(CameraDirections direction, float deltaTime) {
 }
 
 void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch) {
+    if (!gl::enableMovement)
+        return;
+
     xOffset *= mMouseSensitivity;
     yOffset *= mMouseSensitivity;
 

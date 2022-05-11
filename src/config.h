@@ -64,4 +64,5 @@ namespace gl {
     extern float lastY;
     extern bool logoEnabled;
     extern float logoTime;
+    extern bool enableMovement;
 }

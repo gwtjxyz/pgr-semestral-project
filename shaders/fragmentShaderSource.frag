@@ -55,7 +55,7 @@ uniform Spotlight spotlight;
 in vec3 FragPos;
 in vec2 TexCoords;
 in vec3 Normal;
-in vec3 viewPos;
+uniform vec3 viewPos;
 uniform int flagSpotlight;
 uniform vec3 fogCenter;
 
