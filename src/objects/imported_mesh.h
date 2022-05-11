@@ -19,6 +19,7 @@ public:
     std::vector<Texture> mTextures;
 private:
     GLuint mVAO;
+    GLuint mVAOpick;
     GLuint mVBO;
     GLuint mEBO;
 };

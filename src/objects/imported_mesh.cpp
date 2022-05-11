@@ -47,6 +47,11 @@ void ImportedMesh::setupMesh() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
                           sizeof(Vertex), (void *) offsetof(Vertex, texCoords));
 
+    // create VAO for picking
+    glGenVertexArrays(1, &mVAOpick);
+    // enable position attribute
+    glEnableVertexAttribArray(0);
+
     glBindVertexArray(0);
 }
 

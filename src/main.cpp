@@ -35,6 +35,51 @@ void drawFog() {
     setUniform3f("fogCenter", fogCenter);
 }
 
+void drawLights(const glm::vec3 & lightPos, const glm::vec3 * pointLightPositions) {
+    // directional light
+    renderDirectionalLight("dirLight",
+                           {-0.2f, -1.0f, -0.3f},
+                           {0.06f, 0.06f, 0.06f},
+                           {0.4f, 0.4f, 0.4f},
+                           {0.5f, 0.5f, 0.5f});
+
+    // point lights
+    for (int i = 0; i != 3; ++i) {
+        std::string destination = "pointLights[";
+        destination.append(std::to_string(i)).append("]");
+        renderPointLight(destination.c_str(),
+                         pointLightPositions[i],
+                         {0.05f, 0.05f, 0.05f},
+                         {0.8f, 0.8f, 0.8f},
+                         {1.0f, 1.0f, 1.0f},
+                         1.0f,
+                         0.09f,
+                         0.032f);
+    }
+    std::string destination = "pointLights[3]";
+    renderPointLight(destination.c_str(),
+                     lightPos,
+                     {sin(glfwGetTime() * 0.7f), sin(glfwGetTime()) * 0.05f, sin(glfwGetTime()) * 0.15f},
+                     {sin(glfwGetTime()) * 0.6f, sin(glfwGetTime()) * 2.0f, sin(glfwGetTime()) * 1.4f},
+                     {1.0f, 1.0f, 1.0f},
+                     1.0f,
+                     0.14f,
+                     0.07f);
+
+    // spot light
+    renderSpotlight("spotlight",
+                    program.activeCamera.mPosition,
+                    program.activeCamera.mFront,
+                    {0.0f, 0.0f, 0.0f},
+                    {1.0f, 1.0f, 1.0f},
+                    {1.0f, 1.0f, 1.0f},
+                    1.0f,
+                    0.09f,
+                    0.032f,
+                    glm::cos(glm::radians(12.5f)),
+                    glm::cos(glm::radians(15.0f)));
+}
+
 int main() {
     if (!init()) {
         glfwTerminate();
@@ -141,7 +186,10 @@ int main() {
 
     Model backpackModel(R"(../resources/models/backpack/backpack.obj)");
     Model towerModel(R"(../resources/models/tower/scene.gltf)");
-    Model swordModel(R"(../resources/models/sword/Sting.obj)");
+    GLuint swordDiff = loadTexture2D(R"(../resources/models/sword/shortsword_Shortsword_Diffuse.png)");
+    GLuint swordSpec = loadTexture2D(R"(../resources/models/sword/shortsword_Shortsword_Reflection.png)");
+
+    Model swordModel(R"(../resources/models/sword/shortsword.obj)");
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
@@ -184,15 +232,16 @@ int main() {
         // input
         processInput(gl::mainWindow);
 
+        // wireframes
         if (Config::ENABLE_DEBUG)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        // render
+        // clear
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        drawSkybox(skybox);
+
 
         // set up PVM
         glm::mat4 proj = Render::projection();
@@ -201,8 +250,17 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 PVM;
 
+        // set up cursor
+        glm::vec4 viewport = glm::vec4(0, 0, Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT);
+        GLfloat winZ;
+
+
+// =====================================================================
+        // render skybox
+        drawSkybox(skybox);
+
 //=============================================================================
-        // render light
+        // render bouncing cube
         setActiveProgram(gl::lightingId);
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
@@ -226,53 +284,11 @@ int main() {
 //        lightColor.y = sin(glfwGetTime() * 0.7f);
 //        lightColor.z = sin(glfwGetTime() * 1.3f);
 
-        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
-        glm::vec3 ambientColor = lightColor * glm::vec3(0.2f);
+//        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+//        glm::vec3 ambientColor = lightColor * glm::vec3(0.2f);
 
         drawFog();
-
-        // directional light
-        renderDirectionalLight("dirLight",
-                               {-0.2f, -1.0f, -0.3f},
-                               {0.06f, 0.06f, 0.06f},
-                               {0.4f, 0.4f, 0.4f},
-                               {0.5f, 0.5f, 0.5f});
-
-        // point lights
-        for (int i = 0; i != 3; ++i) {
-            std::string destination = "pointLights[";
-            destination.append(std::to_string(i)).append("]");
-            renderPointLight(destination.c_str(),
-                             pointLightPositions[i],
-                             {0.05f, 0.05f, 0.05f},
-                             {0.8f, 0.8f, 0.8f},
-                             {1.0f, 1.0f, 1.0f},
-                             1.0f,
-                             0.09f,
-                             0.032f);
-        }
-        std::string destination = "pointLights[3]";
-        renderPointLight(destination.c_str(),
-                         lightPos,
-                         {sin(glfwGetTime() * 0.7f), sin(glfwGetTime()) * 0.05f, sin(glfwGetTime()) * 0.15f},
-                         {sin(glfwGetTime()) * 0.6f, sin(glfwGetTime()) * 2.0f, sin(glfwGetTime()) * 1.4f},
-                         {1.0f, 1.0f, 1.0f},
-                         1.0f,
-                         0.14f,
-                         0.07f);
-
-        // spot light
-        renderSpotlight("spotlight",
-                        program.activeCamera.mPosition,
-                        program.activeCamera.mFront,
-                        {0.0f, 0.0f, 0.0f},
-                        {1.0f, 1.0f, 1.0f},
-                        {1.0f, 1.0f, 1.0f},
-                        1.0f,
-                        0.09f,
-                        0.032f,
-                        glm::cos(glm::radians(12.5f)),
-                        glm::cos(glm::radians(15.0f)));
+        drawLights(lightPos, pointLightPositions);
 
         // textures
         glActiveTexture(GL_TEXTURE0);
@@ -293,7 +309,7 @@ int main() {
 
         drawTower(towerModel);
 
-        drawSword(swordModel);
+        drawSword(swordModel, swordDiff, swordSpec);
 
         // terrain (please work)
         drawTerrain(terrain, proj, view);
