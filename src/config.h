@@ -3,8 +3,11 @@
 #include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb_image.h>
 
 #include "objects/materials.h"
+
+#define STB_IMAGE_IMPLEMENTATION
 
 // TODO add fancy description
 
@@ -52,10 +55,12 @@ namespace Config {
 // namespace storing rendering-related variables
 // this changes dynamically during the program's execution
 namespace gl {
+    extern GLuint pickFBO;
     extern GLuint programId;
     extern GLuint lightingId;
     extern GLuint skyboxId;
     extern GLuint logoId;
+    extern GLuint pickObjectId;
     extern GLFWwindow * mainWindow;
     extern float deltaTime;
     extern float lastFrame;
@@ -65,4 +70,5 @@ namespace gl {
     extern bool logoEnabled;
     extern float logoTime;
     extern bool enableMovement;
+    extern int swordId;
 }

@@ -2,18 +2,14 @@
 
 #include <iostream>
 #include "config.h"
-
-Program program;
+#include "program.h"
+#include "render.h"
+#include "utils.h"
 
 void setCallbacks();
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity,
                             GLsizei length, const char * message, const void * userParam);
-
-void setActiveProgram(GLuint id) {
-    program.activeId = id;
-    glUseProgram(program.activeId);
-}
 
 // GLFW and OpenGL program initialization function
 bool init() {
@@ -61,6 +57,7 @@ bool init() {
     gl::lightingId = glCreateProgram();
     gl::skyboxId = glCreateProgram();
     gl::logoId = glCreateProgram();
+    gl::pickObjectId = glCreateProgram();
 //    setActiveProgram(gl::programId);
 
     // create and set active camera
@@ -96,6 +93,20 @@ void processInput(GLFWwindow * window) {
         program.activeCamera.processKeyboard(CameraDirections::RIGHT, gl::deltaTime);
 
     switchResolutions();
+}
+
+void pickObject(int button) {
+    unsigned char pixel[4];
+    // doesn't use shaders - allows to read RGBA values directly
+    glReadPixels(Config::WINDOW_WIDTH / 2,
+                 Config::WINDOW_HEIGHT / 2,
+                 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+
+    if (pixel[1] == 0) {
+        std::cout << "Clicked on nothing\n";
+    } else {
+        std::cout << "Clicked on object " << (int) pixel[0] << " in depth " << (float) pixel[2] << std::endl;
+    }
 }
 
 void mouseCallback(GLFWwindow * window, double xPosIn, double yPosIn) {
@@ -145,10 +156,15 @@ void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, in
 }
 
 void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-
+//        pickObject(button);
+        program.isClickHeldDown = true;
+        pickObject(button);
+    }
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        program.isClickHeldDown = false;
+    }
 }
 
 void setCallbacks() {

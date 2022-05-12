@@ -19,9 +19,10 @@ private:
     std::vector<Texture> loadMaterialTextures(aiMaterial * mat,
                                               aiTextureType type,
                                               std::string typeName);
+public:
+    std::vector<ImportedMesh> mMeshes;
 private:
     std::vector<Texture> mLoadedTextures;
-    std::vector<ImportedMesh> mMeshes;
     std::string mDirectory;
 };
 

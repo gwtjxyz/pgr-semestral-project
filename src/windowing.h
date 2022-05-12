@@ -7,24 +7,17 @@
 // TODO add fancy description
 // TODO rename this file, this name is horrible
 
-struct Program {
-    Camera activeCamera;
-    GLuint activeId;
-    int enableWarp = 0;
-    int enableSpotlight = 0;
-};
-
-extern Program program;
-
-void setActiveProgram(GLuint program);
-
 bool init();
 
 void framebufferSizeCallback(GLFWwindow * window, int width, int height);
 
 void processInput(GLFWwindow * window);
 
+void pickObject(int button);
+
 void mouseCallback(GLFWwindow * window, double xPosIn, double yPosIn);
+
+void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods);
 
 void scrollCallback(GLFWwindow * window, double xOffset, double yOffset);
 

@@ -17,9 +17,9 @@ public:
     std::vector<Vertex> mVertices;
     std::vector<GLuint> mIndices;
     std::vector<Texture> mTextures;
+    GLuint mVAOpick;
 private:
     GLuint mVAO;
-    GLuint mVAOpick;
     GLuint mVBO;
     GLuint mEBO;
 };

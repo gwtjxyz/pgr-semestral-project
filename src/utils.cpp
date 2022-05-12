@@ -3,9 +3,9 @@
 #include <fstream>
 #include <iostream>
 #include <stb_image.h>
+#include <glm/gtc/type_ptr.hpp>
 
-#include "windowing.h"
-#include "glm/gtc/type_ptr.hpp"
+#include "program.h"
 
 // helper function for loading a shader file
 // TODO maybe prepend 'shaders/' folder to each function usage

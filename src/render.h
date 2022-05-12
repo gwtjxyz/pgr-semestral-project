@@ -19,12 +19,6 @@
 #include "objects/objects.h"
 
 namespace Render {
-    // model - transforms object space to world space
-
-
-    // view - transforms world space to camera space
-
-
     // projection - transforms camera space to clip space
     glm::mat4 projection();
 }
@@ -34,6 +28,10 @@ void loadMainShaders();
 void loadLightSourceShaders();
 
 void loadSkyboxShaders();
+
+void loadLogoShaders();
+
+void loadPickObjectShaders();
 
 void renderDirectionalLight(const char * varName,
                             glm::vec3 direction,
@@ -61,8 +59,6 @@ void renderSpotlight(const char * varName,
                      float quadratic,
                      float cutoff,
                      float outerCutoff);
-
-void loadLogoShaders();
 
 void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view);
 

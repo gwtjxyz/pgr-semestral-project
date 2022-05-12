@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "windowing.h"
+#include "program.h"
 #include "utils.h"
 
 ImportedMesh::ImportedMesh(std::vector<Vertex> vertices,
@@ -49,8 +49,14 @@ void ImportedMesh::setupMesh() {
 
     // create VAO for picking
     glGenVertexArrays(1, &mVAOpick);
+    // bind the same stuff to it
+    glBindVertexArray(mVAOpick);
+    glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
     // enable position attribute
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex), (void *) 0);
 
     glBindVertexArray(0);
 }

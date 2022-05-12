@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "config.h"
+#include "program.h"
 #include "windowing.h"
 #include "utils.h"
 #include "render.h"
@@ -78,6 +79,41 @@ void drawLights(const glm::vec3 & lightPos, const glm::vec3 * pointLightPosition
                     0.032f,
                     glm::cos(glm::radians(12.5f)),
                     glm::cos(glm::radians(15.0f)));
+}
+
+// TODO do this lol
+void setupFramebuffer() {
+    glGenFramebuffers(1, &gl::pickFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, gl::pickFBO);
+
+    GLuint FBOtex[4];   // R, G, B, A
+    glGenTextures(4, FBOtex);
+    glBindTexture(GL_TEXTURE_2D, FBOtex[0]);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Config::WINDOW_WIDTH, 0, Config::WINDOW_HEIGHT, GL_RED, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, FBOtex[1]);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_GREEN, Config::WINDOW_WIDTH, 0, Config::WINDOW_HEIGHT, GL_GREEN, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, FBOtex[2]);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_BLUE, Config::WINDOW_WIDTH, 0, Config::WINDOW_HEIGHT, GL_BLUE, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, FBOtex[3]);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH, Config::WINDOW_WIDTH, 0, Config::WINDOW_HEIGHT, GL_DEPTH, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBOtex[0], 0);
+
 }
 
 int main() {
@@ -153,6 +189,8 @@ int main() {
     };
 
     // ==============================================================
+    // object selection
+    loadPickObjectShaders();
     // main scene
     loadMainShaders();
 
@@ -190,6 +228,7 @@ int main() {
     GLuint swordSpec = loadTexture2D(R"(../resources/models/sword/shortsword_Shortsword_Reflection.png)");
 
     Model swordModel(R"(../resources/models/sword/shortsword.obj)");
+//    program.swordId = swordModel.
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
@@ -219,6 +258,9 @@ int main() {
     loadLogoShaders();
     Image logo = loadLogo();
 
+    // ===============================================================
+    // pick framebuffer
+    setupFramebuffer();
 
     // main loop
     while (!glfwWindowShouldClose(gl::mainWindow)) {
@@ -249,11 +291,6 @@ int main() {
         glm::mat4 view = program.activeCamera.getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 PVM;
-
-        // set up cursor
-        glm::vec4 viewport = glm::vec4(0, 0, Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT);
-        GLfloat winZ;
-
 
 // =====================================================================
         // render skybox

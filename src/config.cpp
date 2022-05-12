@@ -11,8 +11,7 @@
 //----------------------------------------------------------------------------------------
 #include "config.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+
 
 namespace Config {
     int WINDOW_WIDTH = 800;
@@ -27,10 +26,12 @@ namespace Config {
 }
 
 namespace gl {
+    GLuint pickFBO = 0;
     GLuint programId = 0;
     GLuint lightingId = 0;
     GLuint skyboxId = 0;
     GLuint logoId = 0;
+    GLuint pickObjectId = 0;
     GLFWwindow * mainWindow = nullptr;
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
@@ -40,4 +41,5 @@ namespace gl {
     bool logoEnabled = false;
     float logoTime = 0.0f;
     bool enableMovement = true;
+    int swordId = 1;
 }

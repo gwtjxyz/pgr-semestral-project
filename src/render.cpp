@@ -2,8 +2,8 @@
 
 #include <string>
 
+#include "program.h"
 #include "utils.h"
-#include "windowing.h"
 
 glm::mat4 Render::projection() {
     return glm::perspective(glm::radians(Config::FOV),
@@ -39,6 +39,13 @@ void loadLogoShaders() {
     program.activeId = gl::logoId;
     createShader(GL_VERTEX_SHADER, R"(../shaders/logoShader.vert)");
     createShader(GL_FRAGMENT_SHADER, R"(../shaders/logoShader.frag)");
+    glUseProgram(program.activeId);
+}
+
+void loadPickObjectShaders() {
+    program.activeId = gl::pickObjectId;
+    createShader(GL_VERTEX_SHADER, R"(../shaders/pickShader.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/pickShader.frag)");
     glUseProgram(program.activeId);
 }
 
@@ -217,4 +224,23 @@ void drawSword(Model & sword, GLuint diff, GLuint spec) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, spec);
     sword.draw(gl::programId);
+
+    // object picking
+    glBindFramebuffer(GL_FRAMEBUFFER, gl::pickFBO);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    GLuint oldProgram = program.activeId;
+    setActiveProgram(gl::pickObjectId);
+    setUniformMat4("proj", proj);
+    for (auto & mesh : sword.mMeshes) {
+        glBindVertexArray(mesh.mVAOpick);
+        setUniform1f("id", gl::swordId);
+        setUniformMat4("model", model);
+        glDrawElements(GL_TRIANGLES, mesh.mIndices.size(), GL_UNSIGNED_INT, 0);
+    }
+
+    glBindVertexArray(0);
+    setActiveProgram(oldProgram);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
