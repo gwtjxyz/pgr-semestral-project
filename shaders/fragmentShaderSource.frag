@@ -51,12 +51,14 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform Material materials[NR_MATERIALS];
 uniform DirLight dirLight;
 uniform Spotlight spotlight;
+uniform Spotlight towerSpotlight;
 
 in vec3 FragPos;
 in vec2 TexCoords;
 in vec3 Normal;
 uniform vec3 viewPos;
 uniform int flagSpotlight;
+uniform int flagTowerSpotlight;
 uniform vec3 fogCenter;
 
 out vec4 FragColor;
@@ -83,6 +85,8 @@ void main() {
     // spot light
     if (flagSpotlight == 1)
         result += CalcSpotLight(spotlight, norm, FragPos, viewDir);
+    if (flagTowerSpotlight == 1)
+        result += CalcSpotLight(towerSpotlight, norm, FragPos, viewDir);
 
     vec3 resultWithFog = CalcFogColor(result);
 

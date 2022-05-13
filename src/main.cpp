@@ -79,41 +79,48 @@ void drawLights(const glm::vec3 & lightPos, const glm::vec3 * pointLightPosition
                     0.032f,
                     glm::cos(glm::radians(12.5f)),
                     glm::cos(glm::radians(15.0f)));
+
+    // tower light
+    renderSpotlight("towerSpotlight",
+                    {-15.0f, 30.0f, -15.0f},
+                    {0.0f, -90.0f, 0.0f},
+                    {0.1f, 0.0f, 0.0f},
+                    {1.0f, 0.1f, 0.1f},
+                    {1.0f, 0.1f, 0.1f},
+                    1.0f,
+                    0.09f,
+                    0.032f,
+                    glm::cos(glm::radians(25.5f)),
+                    glm::cos(glm::radians(40.0f)));
 }
 
-// TODO do this lol
 void setupFramebuffer() {
     glGenFramebuffers(1, &gl::pickFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, gl::pickFBO);
 
-    GLuint FBOtex[4];   // R, G, B, A
-    glGenTextures(4, FBOtex);
-    glBindTexture(GL_TEXTURE_2D, FBOtex[0]);
+    // attach color buffer
+    unsigned int colorTex;
+    glGenTextures(1, &colorTex);
+    glBindTexture(GL_TEXTURE_2D, colorTex);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Config::WINDOW_WIDTH, 0, Config::WINDOW_HEIGHT, GL_RED, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTex, 0);
 
-    glBindTexture(GL_TEXTURE_2D, FBOtex[1]);
+    // attach depth buffer
+//    unsigned int depthTex;
+//    glGenTextures(1, &depthTex);
+//    glBindTexture(GL_TEXTURE_2D, depthTex);
+//
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_ATTACHMENT, Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT, 0, GL_DEPTH_ATTACHMENT, GL_DEPTH, nullptr);
+//
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_GREEN, Config::WINDOW_WIDTH, 0, Config::WINDOW_HEIGHT, GL_GREEN, GL_UNSIGNED_BYTE, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, FBOtex[2]);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_BLUE, Config::WINDOW_WIDTH, 0, Config::WINDOW_HEIGHT, GL_BLUE, GL_UNSIGNED_BYTE, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, FBOtex[3]);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH, Config::WINDOW_WIDTH, 0, Config::WINDOW_HEIGHT, GL_DEPTH, GL_UNSIGNED_BYTE, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBOtex[0], 0);
-
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 int main() {
@@ -228,7 +235,10 @@ int main() {
     GLuint swordSpec = loadTexture2D(R"(../resources/models/sword/shortsword_Shortsword_Reflection.png)");
 
     Model swordModel(R"(../resources/models/sword/shortsword.obj)");
-//    program.swordId = swordModel.
+
+    GLuint fireplaceDiff = loadTexture2D(R"(../resources/models/fireplace/ohniste4UVcomplet1.png)");
+    GLuint fireplaceSpec = loadTexture2D(R"(../resources/models/fireplace/ohniste4UVcomplet1spec.png)");
+    Model fireplaceModel(R"(../resources/models/fireplace/fireplace.3ds)");
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
@@ -283,11 +293,11 @@ int main() {
         // clear
         glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        clearPickFramebuffer();
 
 
         // set up PVM
         glm::mat4 proj = Render::projection();
-
         glm::mat4 view = program.activeCamera.getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 PVM;
@@ -298,15 +308,7 @@ int main() {
 
 //=============================================================================
         // render bouncing cube
-        setActiveProgram(gl::lightingId);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f));
-        PVM = proj * view * model;
-
-        setUniformMat4("PVM", PVM);
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        drawLightCube(lightPos, proj, view, lightVAO);
 
 //=============================================================================
         // render cubes
@@ -327,6 +329,7 @@ int main() {
         drawFog();
         drawLights(lightPos, pointLightPositions);
 
+        setUniform1f("materials[0].shininess", 32.0f);
         // textures
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -346,7 +349,9 @@ int main() {
 
         drawTower(towerModel);
 
-        drawSword(swordModel, swordDiff, swordSpec);
+        drawSword(swordModel, swordDiff, swordSpec, currentFrame);
+
+        drawFireplace(fireplaceModel, fireplaceDiff, fireplaceSpec);
 
         // terrain (please work)
         drawTerrain(terrain, proj, view);

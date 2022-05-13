@@ -60,6 +60,13 @@ void renderSpotlight(const char * varName,
                      float cutoff,
                      float outerCutoff);
 
+void clearPickFramebuffer();
+
+void drawLightCube(const glm::vec3 & lightPos,
+                   const glm::mat4 & proj,
+                   const glm::mat4 & view,
+                   GLuint VAO);
+
 void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view);
 
 void drawSkybox(Skybox & skybox);
@@ -70,4 +77,6 @@ void drawTower(Model & tower);
 
 void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj);
 
-void drawSword(Model & sword, GLuint diff, GLuint spec);
+void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time);
+
+void drawFireplace(Model & fireplace, GLuint diff, GLuint spec);

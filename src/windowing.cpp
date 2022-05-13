@@ -96,6 +96,7 @@ void processInput(GLFWwindow * window) {
 }
 
 void pickObject(int button) {
+    glBindFramebuffer(GL_FRAMEBUFFER, gl::pickFBO);
     unsigned char pixel[4];
     // doesn't use shaders - allows to read RGBA values directly
     glReadPixels(Config::WINDOW_WIDTH / 2,
@@ -105,8 +106,16 @@ void pickObject(int button) {
     if (pixel[1] == 0) {
         std::cout << "Clicked on nothing\n";
     } else {
-        std::cout << "Clicked on object " << (int) pixel[0] << " in depth " << (float) pixel[2] << std::endl;
+        std::cout << "Clicked on object " << (int) pixel[0] << std::endl;
+        if (pixel[0] == gl::swordId) {
+            gl::swordClicked = !gl::swordClicked;
+        } else if (pixel[0] == gl::towerId) {
+            gl::towerClicked = !gl::towerClicked;
+        } else if (pixel[0] == gl::fireplaceId) {
+            gl::fireplaceClicked = !gl::fireplaceClicked;
+        }
     }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void mouseCallback(GLFWwindow * window, double xPosIn, double yPosIn) {

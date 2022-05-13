@@ -70,5 +70,12 @@ namespace gl {
     extern bool logoEnabled;
     extern float logoTime;
     extern bool enableMovement;
+    // pick object IDs
     extern int swordId;
+    extern int towerId;
+    extern int fireplaceId;
+    // pick object states
+    extern bool swordClicked;
+    extern bool towerClicked;
+    extern bool fireplaceClicked;
 }

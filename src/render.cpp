@@ -104,6 +104,47 @@ void renderSpotlight(const char * varName,
 
 }
 
+void clearPickFramebuffer() {
+    glBindFramebuffer(GL_FRAMEBUFFER, gl::pickFBO);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void drawPickBuffer(const glm::mat4 & proj, const glm::mat4 & view, const glm::mat4 & model, const Model & object, const GLuint id) {
+    glBindFramebuffer(GL_FRAMEBUFFER, gl::pickFBO);
+
+    GLuint oldProgram = program.activeId;
+    setActiveProgram(gl::pickObjectId);
+    setUniformMat4("proj", proj);
+    setUniformMat4("view", view);
+    for (auto & mesh : object.mMeshes) {
+        glBindVertexArray(mesh.mVAOpick);
+        setUniform1f("id", (float) id / 255);
+        setUniformMat4("model", model);
+        glDrawElements(GL_TRIANGLES, mesh.mIndices.size(), GL_UNSIGNED_INT, 0);
+    }
+
+    glBindVertexArray(0);
+    setActiveProgram(oldProgram);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void drawLightCube(const glm::vec3 & lightPos,
+                   const glm::mat4 & proj,
+                   const glm::mat4 & view,
+                   GLuint VAO) {
+    setActiveProgram(gl::lightingId);
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.2f));
+    glm::mat4 PVM = proj * view * model;
+
+    setUniformMat4("PVM", PVM);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
 void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view) {
     // set up textures
     glActiveTexture(GL_TEXTURE0);
@@ -159,10 +200,18 @@ void drawTower(Model & tower) {
     model = glm::rotate(model, glm::radians(-110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
     PVM = proj * view * model;
-    setUniform1f("materials[0].shininess", 4.0f);
+//    setUniform1f("materials[0].shininess", 4.0f);
     setUniformMat4("model", model);
     setUniformMat4("PVM", PVM);
     tower.draw(gl::programId);
+
+    if (gl::towerClicked) {
+        setUniform1i("flagTowerSpotlight", 1);
+    } else {
+        setUniform1i("flagTowerSpotlight", 0);
+    }
+
+    drawPickBuffer(proj, view, model, tower, gl::towerId);
 }
 
 void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj) {
@@ -206,14 +255,17 @@ void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj) {
     glEnable(GL_DEPTH_TEST);
 }
 
-void drawSword(Model & sword, GLuint diff, GLuint spec) {
+void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time) {
     glm::mat4 proj, view, model, PVM;
     proj = Render::projection();
     view = program.activeCamera.getViewMatrix();
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(5.0f, -5.3f, 10.0f));
-//    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-//    model = glm::rotate(model, glm::radians(-110.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    if (gl::swordClicked) {
+        model = glm::rotate(model,
+                            glm::radians(sin(time) * 360.0f),
+                            glm::vec3(0.0f, 1.0f, 0.0f));
+    }
     model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
     PVM = proj * view * model;
 //    setUniform1f("materials[0].shininess", 4.0f);
@@ -226,21 +278,30 @@ void drawSword(Model & sword, GLuint diff, GLuint spec) {
     sword.draw(gl::programId);
 
     // object picking
-    glBindFramebuffer(GL_FRAMEBUFFER, gl::pickFBO);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    drawPickBuffer(proj, view, model, sword, gl::swordId);
+}
 
-    GLuint oldProgram = program.activeId;
-    setActiveProgram(gl::pickObjectId);
-    setUniformMat4("proj", proj);
-    for (auto & mesh : sword.mMeshes) {
-        glBindVertexArray(mesh.mVAOpick);
-        setUniform1f("id", gl::swordId);
-        setUniformMat4("model", model);
-        glDrawElements(GL_TRIANGLES, mesh.mIndices.size(), GL_UNSIGNED_INT, 0);
-    }
+void drawFireplace(Model & fireplace, GLuint diff, GLuint spec) {
+    glm::mat4 proj, view, model, PVM;
+    proj = Render::projection();
+    view = program.activeCamera.getViewMatrix();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-12.0f, -5.3f, -10.0f));
+    model = glm::rotate(model,
+                        glm::radians(-90.0f),
+                        glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+    PVM = proj * view * model;
+//    setUniform1f("materials[0].shininess", 4.0f);
+    setUniform1f("materials[0].shininess", 1.0f);
+    setUniformMat4("model", model);
+    setUniformMat4("PVM", PVM);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diff);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, spec);
+    fireplace.draw(gl::programId);
 
-    glBindVertexArray(0);
-    setActiveProgram(oldProgram);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // object picking
+    drawPickBuffer(proj, view, model, fireplace, gl::fireplaceId);
 }

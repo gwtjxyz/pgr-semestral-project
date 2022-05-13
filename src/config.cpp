@@ -41,5 +41,12 @@ namespace gl {
     bool logoEnabled = false;
     float logoTime = 0.0f;
     bool enableMovement = true;
+    // pick object IDs
     int swordId = 1;
+    int towerId = 2;
+    int fireplaceId = 3;
+    // pick object states
+    bool swordClicked = false;
+    bool towerClicked = false;
+    bool fireplaceClicked = false;
 }
