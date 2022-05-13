@@ -79,6 +79,8 @@ void drawTower(Model & tower);
 
 void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj);
 
+void drawFire(Image & fire, const glm::mat4 & view, const glm::mat4 & proj);
+
 void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time);
 
 void drawFireplace(Model & fireplace, GLuint diff, GLuint spec);

@@ -109,17 +109,6 @@ void setupFramebuffer() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTex, 0);
 
-    // attach depth buffer
-//    unsigned int depthTex;
-//    glGenTextures(1, &depthTex);
-//    glBindTexture(GL_TEXTURE_2D, depthTex);
-//
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_ATTACHMENT, Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT, 0, GL_DEPTH_ATTACHMENT, GL_DEPTH, nullptr);
-//
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -238,7 +227,7 @@ int main() {
 
     GLuint fireplaceDiff = loadTexture2D(R"(../resources/models/fireplace/ohniste4UVcomplet1.png)");
     GLuint fireplaceSpec = loadTexture2D(R"(../resources/models/fireplace/ohniste4UVcomplet1spec.png)");
-    Model fireplaceModel(R"(../resources/models/fireplace/fireplace.3ds)");
+    Model fireplaceModel(R"(../resources/models/fireplace/fireplace.3ds)");  
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
@@ -267,6 +256,11 @@ int main() {
     // logo
     loadLogoShaders();
     Image logo = loadLogo();
+
+    // ================================================================
+    // fire texture animation
+    loadFireShaders();
+    Image fire = loadFire();  
 
     // ===============================================================
     // pick framebuffer
@@ -356,9 +350,9 @@ int main() {
         // terrain (please work)
         drawTerrain(terrain, proj, view);
 
-        // logo
-
+        // images
         drawLogo(logo, view, proj);
+        drawFire(fire, view, proj);
 
         // check and call events and swap the buffers
         glfwSwapBuffers(gl::mainWindow);

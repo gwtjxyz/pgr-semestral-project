@@ -112,4 +112,30 @@ Image loadLogo() {
     return logo;
 }
 
-// TODO texture animation
+Image loadFire() {
+    Image fire{};
+    float fireVertices[] = {
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f, 0.0f
+    };
+
+    fire.texture = loadTexture2D(R"(../resources/fireSheet.png)");
+    
+    glGenVertexArrays(1, &fire.VAO);
+    glGenBuffers(1, &fire.VBO);
+
+    glBindVertexArray(fire.VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, fire.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(fireVertices), fireVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) nullptr);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    fire.position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    return fire;
+}

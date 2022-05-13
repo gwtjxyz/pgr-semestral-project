@@ -70,6 +70,7 @@ namespace gl {
     extern float lastY;
     extern bool logoEnabled;
     extern float logoTime;
+    extern float fireTime;
     extern bool enableMovement;
     // pick object IDs
     extern int swordId;

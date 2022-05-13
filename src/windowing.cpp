@@ -114,6 +114,7 @@ void pickObject(int button) {
             gl::towerClicked = !gl::towerClicked;
         } else if (pixel[0] == gl::fireplaceId) {
             gl::fireplaceClicked = !gl::fireplaceClicked;
+            gl::fireTime = 0.0f;
         }
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

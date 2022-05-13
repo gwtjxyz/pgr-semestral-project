@@ -262,6 +262,42 @@ void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj) {
     glEnable(GL_DEPTH_TEST);
 }
 
+void drawFire(Image & fire, const glm::mat4 & view, const glm::mat4 & proj) {
+    if (gl::fireplaceClicked)
+        return;
+
+    setActiveProgram(gl::fireId);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-12.0f, -5.3f, -10.0f));
+    model = glm::rotate(model,
+                        glm::radians(-180.0f),
+                        glm::vec3(1.0f, 0.0f, 0.0f));
+
+    glm::mat4 PVM = proj * view * model;
+    setUniformMat4("PVM", PVM);
+    setUniform1i("texSampler", 0);
+    setUniform1f("time", gl::fireTime);
+    glBindVertexArray(fire.VAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, fire.texture);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    model = glm::rotate(model,
+                        glm::radians(90.0f),
+                        glm::vec3(0.0f, 1.0f, 0.0f));
+    PVM = proj * view * model;
+    setUniformMat4("PVM", PVM);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    gl::fireTime += gl::deltaTime;
+    // gl::fireTime += 0.1f;
+
+    glDisable(GL_BLEND);
+}
+
 void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time) {
     glm::mat4 proj, view, model, PVM;
     proj = Render::projection();
@@ -270,7 +306,7 @@ void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time) {
     model = glm::translate(model, glm::vec3(5.0f, -5.3f, 10.0f));
     if (gl::swordClicked) {
         model = glm::rotate(model,
-                            glm::radians(sin(time) * 360.0f),
+                            (float) glm::radians(sin(time) * 360.0f),
                             glm::vec3(0.0f, 1.0f, 0.0f));
     }
     model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));

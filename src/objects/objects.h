@@ -25,3 +25,5 @@ Skybox loadSkybox();
 Model loadBackpack();
 
 Image loadLogo();
+
+Image loadFire();
