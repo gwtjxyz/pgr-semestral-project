@@ -33,6 +33,8 @@ void loadLogoShaders();
 
 void loadPickObjectShaders();
 
+void loadFireShaders();
+
 void renderDirectionalLight(const char * varName,
                             glm::vec3 direction,
                             glm::vec3 ambient,

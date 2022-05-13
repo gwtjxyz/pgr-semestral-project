@@ -32,6 +32,7 @@ namespace gl {
     GLuint skyboxId = 0;
     GLuint logoId = 0;
     GLuint pickObjectId = 0;
+    GLuint fireId = 0;
     GLFWwindow * mainWindow = nullptr;
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;

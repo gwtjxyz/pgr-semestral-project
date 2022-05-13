@@ -15,16 +15,16 @@ glm::mat4 Render::projection() {
 void loadMainShaders() {
     program.activeId = gl::programId;
 //    setActiveProgram(gl::programId);
-    createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderSource.vert)");
-    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderSource.frag)");
+    createShader(GL_VERTEX_SHADER, R"(../shaders/mainShader.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/mainShader.frag)");
     glUseProgram(program.activeId);
 }
 
 void loadLightSourceShaders() {
 //    setActiveProgram(gl::lightingId);
     program.activeId = gl::lightingId;
-    createShader(GL_VERTEX_SHADER, R"(../shaders/vertexShaderLightSrc.vert)");
-    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fragmentShaderLightSrc.frag)");
+    createShader(GL_VERTEX_SHADER, R"(../shaders/lightSrc.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/lightSrc.frag)");
     glUseProgram(program.activeId);
 }
 
@@ -46,6 +46,13 @@ void loadPickObjectShaders() {
     program.activeId = gl::pickObjectId;
     createShader(GL_VERTEX_SHADER, R"(../shaders/pickShader.vert)");
     createShader(GL_FRAGMENT_SHADER, R"(../shaders/pickShader.frag)");
+    glUseProgram(program.activeId);
+}
+
+void loadFireShaders() {
+    program.activeId = gl::fireId;
+    createShader(GL_VERTEX_SHADER, R"(../shaders/fire.vert)");
+    createShader(GL_FRAGMENT_SHADER, R"(../shaders/fire.frag)");
     glUseProgram(program.activeId);
 }
 

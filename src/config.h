@@ -61,6 +61,7 @@ namespace gl {
     extern GLuint skyboxId;
     extern GLuint logoId;
     extern GLuint pickObjectId;
+    extern GLuint fireId;
     extern GLFWwindow * mainWindow;
     extern float deltaTime;
     extern float lastFrame;
