@@ -20,6 +20,10 @@ struct Image {
     float time;
 };
 
+Object loadCubes();
+
+Object loadLightSourceCube(Object & otherCube);
+
 Skybox loadSkybox();
 
 Model loadBackpack();

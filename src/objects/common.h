@@ -40,6 +40,14 @@ struct Texture {
     std::string path;
 };
 
+struct Object {
+    GLuint VAO;
+    GLuint VBO;
+    GLuint specular;
+    GLuint diffuse;
+};
+
+// unused
 enum class LightType {
     DIRECTIONAL,
     POINT,

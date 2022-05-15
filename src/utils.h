@@ -44,3 +44,5 @@ GLuint loadTextureFromFile(const char * path, const std::string & directory, boo
 GLuint loadCubemap(std::vector<std::string> faces);
 
 void loadMaterials();
+
+void setupFramebuffer();

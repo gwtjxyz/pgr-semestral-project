@@ -137,6 +137,44 @@ void drawPickBuffer(const glm::mat4 & proj, const glm::mat4 & view, const glm::m
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void drawTenCubes(const glm::mat4 & proj, const glm::mat4 & view, Object & cube) {
+
+    glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f,  0.0f,  0.0f),
+            glm::vec3( 2.0f,  5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3( 2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f,  3.0f, -7.5f),
+            glm::vec3( 1.3f, -2.0f, -2.5f),
+            glm::vec3( 1.5f,  2.0f, -2.5f),
+            glm::vec3( 1.5f,  0.2f, -1.5f),
+            glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
+    setUniform1f("materials[0].shininess", 32.0f);
+    // textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, cube.diffuse);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, cube.specular);
+
+    glBindVertexArray(cube.VAO);
+
+    for (int i = 0; i != 10; ++i) {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, cubePositions[i]);
+        float angle = 20.0f * (float) i;
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+        glm::mat4 PVM = proj * view * model;
+        setUniformMat4("PVM", PVM);
+        setUniformMat4("model", model);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+}
+
 void drawLightCube(const glm::vec3 & lightPos,
                    const glm::mat4 & proj,
                    const glm::mat4 & view,
@@ -150,6 +188,69 @@ void drawLightCube(const glm::vec3 & lightPos,
     setUniformMat4("PVM", PVM);
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void drawFog() {
+    glm::vec3 fogCenter = program.activeCamera.mPosition;
+    setUniform3f("fogCenter", fogCenter);
+}
+
+void drawLights(const glm::vec3 & lightPos, const glm::vec3 * pointLightPositions) {
+    // directional light
+    renderDirectionalLight("dirLight",
+                           {-0.2f, -1.0f, -0.3f},
+                           {0.06f, 0.06f, 0.06f},
+                           {0.4f, 0.4f, 0.4f},
+                           {0.5f, 0.5f, 0.5f});
+
+    // point lights
+    for (int i = 0; i != 3; ++i) {
+        std::string destination = "pointLights[";
+        destination.append(std::to_string(i)).append("]");
+        renderPointLight(destination.c_str(),
+                         pointLightPositions[i],
+                         {0.05f, 0.05f, 0.05f},
+                         {0.8f, 0.8f, 0.8f},
+                         {1.0f, 1.0f, 1.0f},
+                         1.0f,
+                         0.09f,
+                         0.032f);
+    }
+    std::string destination = "pointLights[3]";
+    renderPointLight(destination.c_str(),
+                     lightPos,
+                     {sin(glfwGetTime() * 0.7f), sin(glfwGetTime()) * 0.05f, sin(glfwGetTime()) * 0.15f},
+                     {sin(glfwGetTime()) * 0.6f, sin(glfwGetTime()) * 2.0f, sin(glfwGetTime()) * 1.4f},
+                     {1.0f, 1.0f, 1.0f},
+                     1.0f,
+                     0.14f,
+                     0.07f);
+
+    // spot light
+    renderSpotlight("spotlight",
+                    program.activeCamera.mPosition,
+                    program.activeCamera.mFront,
+                    {0.0f, 0.0f, 0.0f},
+                    {1.0f, 1.0f, 1.0f},
+                    {1.0f, 1.0f, 1.0f},
+                    1.0f,
+                    0.09f,
+                    0.032f,
+                    glm::cos(glm::radians(12.5f)),
+                    glm::cos(glm::radians(15.0f)));
+
+    // tower light
+    renderSpotlight("towerSpotlight",
+                    {-15.0f, 30.0f, -15.0f},
+                    {0.0f, -90.0f, 0.0f},
+                    {0.1f, 0.0f, 0.0f},
+                    {1.0f, 0.1f, 0.1f},
+                    {1.0f, 0.1f, 0.1f},
+                    1.0f,
+                    0.09f,
+                    0.032f,
+                    glm::cos(glm::radians(25.5f)),
+                    glm::cos(glm::radians(40.0f)));
 }
 
 void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view) {

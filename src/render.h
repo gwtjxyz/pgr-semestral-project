@@ -64,10 +64,16 @@ void renderSpotlight(const char * varName,
 
 void clearPickFramebuffer();
 
+void drawTenCubes(const glm::mat4 & proj, const glm::mat4 & view, Object & cube);
+
 void drawLightCube(const glm::vec3 & lightPos,
                    const glm::mat4 & proj,
                    const glm::mat4 & view,
                    GLuint VAO);
+
+void drawFog();
+
+void drawLights(const glm::vec3 & lightPos, const glm::vec3 * pointLightPositions);
 
 void drawTerrain(Terrain terrain, const glm::mat4 & proj, const glm::mat4 & view);
 
