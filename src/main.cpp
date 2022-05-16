@@ -139,6 +139,15 @@ int main() {
         drawLogo(logo, view, proj);
         drawFire(fire, view, proj);
 
+        // UI
+        if (gl::guiEnabled) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            gl::screen->drawWidgets();
+            if (Config::ENABLE_DEBUG)
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glEnable(GL_DEPTH_TEST);
+        }
+
         // check and call events and swap the buffers
         glfwSwapBuffers(gl::mainWindow);
         glfwPollEvents();

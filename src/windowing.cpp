@@ -11,6 +11,10 @@ void setCallbacks();
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity,
                             GLsizei length, const char * message, const void * userParam);
 
+void initNanogui();
+
+void switchGui();
+
 // GLFW and OpenGL program initialization function
 bool init() {
     if (!glfwInit()) {
@@ -79,7 +83,7 @@ bool init() {
                    Config::STATIC_CAMERA_PITCH_2);
     static2.mStatic = true;
     program.staticCamera2 = static2;
-
+    // bird POV
     Camera dynamic({-15.0f, 14.0f, -15.0f},
                    {0.0f, 1.0f, 0.0f},
                    Config::YAW,
@@ -87,9 +91,59 @@ bool init() {
     dynamic.mStatic = true;
     program.dynamicCamera = dynamic;
 
+    // UI
+    initNanogui();
+
     glEnable(GL_DEPTH_TEST);
 
     return true;
+}
+
+void initNanogui() {
+    gl::screen = new nanogui::Screen();
+    gl::screen->initialize(gl::mainWindow, true);
+
+    // create nanogui gui
+    gl::gui = new nanogui::FormHelper(gl::screen);
+    nanogui::ref<nanogui::Window> menuWindow1 =
+            gl::gui->addWindow(Eigen::Vector2i(10, 10), "Interactibles and cameras");
+    gl::gui->addGroup("Interactive objects");
+    gl::gui->addButton("Tower", []() { gl::towerClicked = !gl::towerClicked; })->setTooltip("Gives the tower an ominous glow.");
+    gl::gui->addButton("Sword", []() { gl::swordClicked = !gl::swordClicked; })->setTooltip("Spins the sword around. Weeeeeeeeee!");
+    gl::gui->addButton("Campfire", []() { gl::fireplaceClicked = !gl::fireplaceClicked; })->setTooltip("Ignites the campfire (or snuffs it out)");
+
+    gl::gui->addGroup("Cameras");
+    gl::gui->addButton("Main camera", [] () { program.activeCamera = &program.mainCamera; })->setTooltip("Default hotkey: 1");
+    gl::gui->addButton("Static camera 1", [] () { program.activeCamera = &program.staticCamera1; })->setTooltip("Default hotkey: 2");
+    gl::gui->addButton("Static camera 2", [] () { program.activeCamera = &program.staticCamera2; })->setTooltip("Default hotkey: 3");
+    gl::gui->addButton("Bird camera", [] () { program.activeCamera = &program.dynamicCamera; })->setTooltip("Default hotkey: 4");
+
+    gl::screen->setVisible(true);
+
+    nanogui::ref<nanogui::Window> menuWindow2 =
+            gl::gui->addWindow( Eigen::Vector2i(10, 10), "Additional controls");
+    gl::gui->addGroup("Main menu");
+    gl::gui->addButton("Back", []() { switchGui(); })->setTooltip("Closes this menu.");
+    gl::gui->addButton("Exit", []() { glfwSetWindowShouldClose(gl::mainWindow, true); })->setBackgroundColor({200, 20, 20, 200});
+
+    gl::gui->addGroup("Misc");
+    gl::gui->addButton("Flashlight", []() { program.enableSpotlight = !program.enableSpotlight; })->setTooltip("Default hotkey: E");
+    gl::gui->addButton("Scrolling logo", []() { gl::logoEnabled = !gl::logoEnabled; })->setTooltip("Default hotkey: F1");
+    gl::gui->addButton("Normal pills", []() { program.enableWarp = !program.enableWarp; })->setTooltip("Default hotkey: Q");
+    gl::gui->addButton("Show wireframes", []() { Config::ENABLE_DEBUG = !Config::ENABLE_DEBUG; })->setTooltip("Default hotkey: F");
+
+    gl::screen->performLayout();
+    menuWindow1->setPosition(Eigen::Vector2i(Config::WINDOW_WIDTH / 4, (Config::WINDOW_HEIGHT / 4)));
+    menuWindow2->setPosition(Eigen::Vector2i(Config::WINDOW_WIDTH / 2, (Config::WINDOW_HEIGHT / 4)));
+}
+
+void switchGui() {
+    if (gl::guiEnabled)
+        glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    else
+        glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    gl::guiEnabled = !gl::guiEnabled;
+    program.mainCamera.mStatic = !program.mainCamera.mStatic;
 }
 
 void framebufferSizeCallback(GLFWwindow * window, int width, int height) {
@@ -103,9 +157,6 @@ void switchResolutions() {
 }
 
 void processInput(GLFWwindow * window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         program.activeCamera->processKeyboard(CameraDirections::FORWARD, gl::deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
@@ -119,6 +170,10 @@ void processInput(GLFWwindow * window) {
 }
 
 void pickObject(int button) {
+    // prevent conflicting input with popup GUI
+    if (gl::guiEnabled)
+        return;
+
     glBindFramebuffer(GL_FRAMEBUFFER, gl::pickFBO);
     unsigned char pixel[4];
     // doesn't use shaders - allows to read RGBA values directly
@@ -159,6 +214,7 @@ void mouseCallback(GLFWwindow * window, double xPosIn, double yPosIn) {
     gl::lastY = yPos;
 
     program.activeCamera->processMouseMovement(xOffset, yOffset);
+    gl::screen->cursorPosCallbackEvent(xPosIn, yPosIn);
 }
 
 void scrollCallback(GLFWwindow * window, double xOffset, double yOffset) {
@@ -195,10 +251,15 @@ void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, in
         program.activeCamera = &program.staticCamera2;
     if (key == GLFW_KEY_4 && action == GLFW_PRESS)
         program.activeCamera = &program.dynamicCamera;
+
+    // NanoGUI
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        switchGui();
+    }
 }
 
 void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && !gl::guiEnabled) {
         glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 //        pickObject(button);
         program.isClickHeldDown = true;
@@ -207,6 +268,7 @@ void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods) 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
         program.isClickHeldDown = false;
     }
+    gl::screen->mouseButtonCallbackEvent(button, action, mods);
 }
 
 void setCallbacks() {

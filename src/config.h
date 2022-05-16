@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
+#include <nanogui/nanogui.h>
 
 #include "objects/materials.h"
 
@@ -64,6 +65,9 @@ namespace Config {
 // namespace storing rendering-related variables
 // this changes dynamically during the program's execution
 namespace gl {
+    extern nanogui::Screen * screen;
+    extern nanogui::FormHelper * gui;
+    extern bool guiEnabled;
     extern GLuint pickFBO;
     extern GLuint programId;
     extern GLuint lightingId;

@@ -216,7 +216,7 @@ Image loadFire() {
     glGenVertexArrays(1, &fire.VAO);
     glGenBuffers(1, &fire.VBO);
 
-    glBindVertexArray(fire.VBO);
+    glBindVertexArray(fire.VAO);
     glBindBuffer(GL_ARRAY_BUFFER, fire.VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(fireVertices), fireVertices, GL_STATIC_DRAW);
 

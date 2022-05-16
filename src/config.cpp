@@ -26,6 +26,9 @@ namespace Config {
 }
 
 namespace gl {
+    nanogui::Screen * screen = nullptr;
+    nanogui::FormHelper * gui = nullptr;
+    bool guiEnabled = false;
     GLuint pickFBO = 0;
     GLuint programId = 0;
     GLuint lightingId = 0;

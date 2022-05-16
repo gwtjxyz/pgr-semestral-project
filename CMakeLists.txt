@@ -48,6 +48,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC include/assimp/include
         PUBLIC include/glm
         PUBLIC include/stb
+        PUBLIC include/nanogui/include
         )
 
 target_link_directories(${PROJECT_NAME}
