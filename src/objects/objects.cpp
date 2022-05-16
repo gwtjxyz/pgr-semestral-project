@@ -82,7 +82,7 @@ Object loadCubes() {
 Object loadLightSourceCube(Object & otherCube) {
     Object lightSrcCube{};
     
-    lightSrcCube.VAO = otherCube.VAO;
+    lightSrcCube.VBO = otherCube.VBO;
     glGenVertexArrays(1, &lightSrcCube.VAO);
     glBindVertexArray(lightSrcCube.VAO);
     // we only need to bind to the VBO, the container's VBO data already has the needed data
@@ -90,6 +90,8 @@ Object loadLightSourceCube(Object & otherCube) {
     // set the vertex attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
+
+    return lightSrcCube;
 }
 
 Skybox loadSkybox() {
