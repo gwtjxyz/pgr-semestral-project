@@ -25,5 +25,8 @@ vec4 sampleTexture(int frame) {
 void main() {
     int frame = int(time / frameDuration);
 
-    FragColor = sampleTexture(frame);
+    vec4 color = sampleTexture(frame);
+//    if (color.a < 0.05)
+//        discard;
+    FragColor = color;
 }

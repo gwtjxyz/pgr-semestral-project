@@ -26,6 +26,7 @@ Camera::Camera(glm::vec3 position,
     mMouseSensitivity = Config::SENSITIVITY;
     mZoom = Config::ZOOM;
     mIsSprinting = false;
+    mStatic = false;
     updateCameraVectors();
 }
 
@@ -41,6 +42,7 @@ Camera::Camera(float posX, float posY, float posZ,
     mMouseSensitivity = Config::SENSITIVITY;
     mZoom = Config::ZOOM;
     mIsSprinting = false;
+    mStatic = false;
     updateCameraVectors();
 }
 
@@ -51,7 +53,7 @@ glm::mat4 Camera::getViewMatrix() {
 }
 
 void Camera::processKeyboard(CameraDirections direction, float deltaTime) {
-    if (!gl::enableMovement)
+    if (mStatic)
         return;
 
     float velocity;
@@ -89,7 +91,7 @@ void Camera::processKeyboard(CameraDirections direction, float deltaTime) {
 }
 
 void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch) {
-    if (!gl::enableMovement)
+    if (mStatic)
         return;
 
     xOffset *= mMouseSensitivity;

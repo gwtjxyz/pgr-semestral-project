@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -35,14 +36,15 @@ int main() {
     loadMainShaders();
 
     setActiveProgram(gl::programId);
-    setUniform1i("materials[0].diffuse", 0);
-    setUniform1i("materials[0].specular", 1);
-//    setUniform3f("material.specular", 0.5f, 0.5f, 0.5f);
+//    setUniform1i("materials[0].diffuse", 0);
+//    setUniform1i("materials[0].specular", 1);
     setUniform1f("materials[0].shininess", 32.0f);
 
     Object cubes = loadCubes();
 
     Model backpackModel(R"(../resources/models/backpack/backpack.obj)");
+
+    Model treeModel(R"(../resources/models/dead_tree/tree_.fbx)");
 
     Model towerModel(R"(../resources/models/tower/scene.gltf)");
     // do this because this model's textures are broken otherwise
@@ -52,46 +54,39 @@ int main() {
     // same here
     GLuint fireplaceDiff = loadTexture2D(R"(../resources/models/fireplace/ohniste4UVcomplet1.png)");
     GLuint fireplaceSpec = loadTexture2D(R"(../resources/models/fireplace/ohniste4UVcomplet1spec.png)");
-    Model fireplaceModel(R"(../resources/models/fireplace/fireplace.3ds)");  
+    Model fireplaceModel(R"(../resources/models/fireplace/fireplace.3ds)");
+
+    Model gullModel(R"(../resources/models/bird/bird static.fbx)");
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
-    // ================================================================
+    // ==============================================================
     // skybox
-    stbi_set_flip_vertically_on_load(false);
     Skybox skybox = loadSkybox();
-    stbi_set_flip_vertically_on_load(true);
-
-    // ================================================================
+    // ==============================================================
     // lighting - light source creation
     loadLightSourceShaders();
-
     Object lightSourceCube = loadLightSourceCube(cubes);
-
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-
     // ==============================================================
     // logo
     loadLogoShaders();
     Image logo = loadLogo();
-
-    // ================================================================
+    // ===============================================================
     // fire texture animation
     loadFireShaders();
-    Image fire = loadFire();  
-
+    Image fire = loadFire();
     // ===============================================================
     // pick framebuffer
     setupFramebuffer();
-
+    // ===============================================================
     // main loop
     while (!glfwWindowShouldClose(gl::mainWindow)) {
 
         // per-frame time logic
-        float currentFrame = (float) glfwGetTime();
-        gl::deltaTime = currentFrame - gl::lastFrame;
-        gl::lastFrame = currentFrame;
+        updateTime();
         lightPos.y = sin(glfwGetTime());
+//        lightPos.x = cos(glfwGetTime());
 
         // input
         processInput(gl::mainWindow);
@@ -107,57 +102,37 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         clearPickFramebuffer();
 
-
         // set up PVM
         glm::mat4 proj = Render::projection();
-        glm::mat4 view = program.activeCamera.getViewMatrix();
+        glm::mat4 view = program.activeCamera->getViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 PVM;
-
-// =====================================================================
+//=============================================================================
         // render skybox
         drawSkybox(skybox);
-
 //=============================================================================
         // render bouncing cube
         drawLightCube(lightPos, proj, view, lightSourceCube.VAO);
-
 //=============================================================================
-        // render cubes
+        // set up main shader uniforms
         setActiveProgram(gl::programId);
         setUniform1i("warp.flagWarp", program.enableWarp);
         setUniform1i("flagSpotlight", program.enableSpotlight);
-        setUniform3f("viewPos", program.activeCamera.mPosition);
+        setUniform3f("viewPos", program.activeCamera->mPosition);
         setUniform1f("warp.warpBy", (float) sin(glfwGetTime()));
-
-        glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-//        lightColor.x = sin(glfwGetTime() * 2.0f);
-//        lightColor.y = sin(glfwGetTime() * 0.7f);
-//        lightColor.z = sin(glfwGetTime() * 1.3f);
-
-//        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
-//        glm::vec3 ambientColor = lightColor * glm::vec3(0.2f);
+        // render objects
 
         drawFog();
         drawLights(lightPos, pointLightPositions);
-
         drawTenCubes(proj, view, cubes);
-
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-        PVM = proj * view * model;
-        setUniformMat4("model", model);
-        setUniformMat4("PVM", PVM);
-        backpackModel.draw(gl::programId);
-
+        drawBackpack(backpackModel);
+        drawTrees(treeModel);
         drawTower(towerModel);
-
-        drawSword(swordModel, swordDiff, swordSpec, currentFrame);
-
+        drawSword(swordModel, swordDiff, swordSpec, gl::lastFrame);
         drawFireplace(fireplaceModel, fireplaceDiff, fireplaceSpec);
+        drawSeagull(gullModel);
 
-        // terrain (please work)
+        // terrain
         drawTerrain(terrain, proj, view);
 
         // images

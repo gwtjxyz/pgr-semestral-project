@@ -95,6 +95,7 @@ Object loadLightSourceCube(Object & otherCube) {
 }
 
 Skybox loadSkybox() {
+    stbi_set_flip_vertically_on_load(false);
     loadSkyboxShaders();
     Skybox skybox{};
 
@@ -152,7 +153,7 @@ Skybox loadSkybox() {
             R"(../resources/skybox/day/back.jpg)"
     };
     skybox.texture = loadCubemap(skyboxFaces);
-    skybox.cloudsTexture = loadTexture2D(R"(../resources/clouds.jpg)");
+//    skybox.cloudsTexture = loadTexture2D(R"(../resources/clouds.jpg)");
 
     glGenVertexArrays(1, &skybox.VAO);
     glGenBuffers(1, &skybox.VBO);
@@ -164,6 +165,7 @@ Skybox loadSkybox() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) nullptr);
     glEnableVertexAttribArray(0);
 
+    stbi_set_flip_vertically_on_load(true);
     return skybox;
 }
 

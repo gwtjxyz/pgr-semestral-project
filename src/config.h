@@ -43,13 +43,22 @@ namespace Config {
     // terrain
     const int TERRAIN_SIZE = 512;
     const int TERRAIN_TEXTURE_STEP = 32;
-    const char * const TERRAIN_TEXTURE_DIFFUSE = R"(../resources/grass.jpg)";
-    const char * const TERRAIN_TEXTURE_SPECULAR = R"(../resources/grass.jpg)";
+    const char * const TERRAIN_TEXTURE_DIFFUSE = R"(../resources/deadgrass.jpg)";
+    const char * const TERRAIN_TEXTURE_SPECULAR = R"(../resources/deadgrass.jpg)";
     const float TERRAIN_Y = -6.0f;
 
     // models
     const std::string TEXTURE_DIFFUSE = "diffuse";
     const std::string TEXTURE_SPECULAR = "specular";
+
+    // static camera settings
+    const glm::vec3 STATIC_CAMERA_POS_1 = glm::vec3(-20.0f, 8.0f, -5.0f);
+    const float STATIC_CAMERA_YAW_1 = 30.0f;
+    const float STATIC_CAMERA_PITCH_1 = -10.0f;
+
+    const glm::vec3 STATIC_CAMERA_POS_2 = glm::vec3(9.6f, -1.8f, -4.4f);
+    const float STATIC_CAMERA_YAW_2 = -161.0f;
+    const float STATIC_CAMERA_PITCH_2 = -15.7f;
 }
 
 // namespace storing rendering-related variables

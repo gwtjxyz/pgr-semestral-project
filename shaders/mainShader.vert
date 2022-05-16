@@ -21,6 +21,7 @@ void main() {
     gl_Position = PVM * vec4(aPos, 1.0f);
     if (warp.flagWarp == 1) {
         gl_Position.x += sin(gl_Position.x) * warp.warpBy;
+//        gl_Position.y += cos(gl_Position.y) * warp.warpBy * 10f;
     }
     FragPos = vec3(model * vec4(aPos, 1.0));
     // gets rid of offsets caused by non-uniform scaling

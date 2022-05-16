@@ -14,14 +14,12 @@ glm::mat4 Render::projection() {
 
 void loadMainShaders() {
     program.activeId = gl::programId;
-//    setActiveProgram(gl::programId);
     createShader(GL_VERTEX_SHADER, R"(../shaders/mainShader.vert)");
     createShader(GL_FRAGMENT_SHADER, R"(../shaders/mainShader.frag)");
     glUseProgram(program.activeId);
 }
 
 void loadLightSourceShaders() {
-//    setActiveProgram(gl::lightingId);
     program.activeId = gl::lightingId;
     createShader(GL_VERTEX_SHADER, R"(../shaders/lightSrc.vert)");
     createShader(GL_FRAGMENT_SHADER, R"(../shaders/lightSrc.frag)");
@@ -108,7 +106,6 @@ void renderSpotlight(const char * varName,
     setUniform1f((destination + ".quadratic").c_str(), quadratic);
     setUniform1f((destination + ".cutoff").c_str(), cutoff);
     setUniform1f((destination + ".outerCutoff").c_str(), outerCutoff);
-
 }
 
 void clearPickFramebuffer() {
@@ -138,7 +135,6 @@ void drawPickBuffer(const glm::mat4 & proj, const glm::mat4 & view, const glm::m
 }
 
 void drawTenCubes(const glm::mat4 & proj, const glm::mat4 & view, Object & cube) {
-
     glm::vec3 cubePositions[] = {
             glm::vec3( 0.0f,  0.0f,  0.0f),
             glm::vec3( 2.0f,  5.0f, -15.0f),
@@ -191,7 +187,7 @@ void drawLightCube(const glm::vec3 & lightPos,
 }
 
 void drawFog() {
-    glm::vec3 fogCenter = program.activeCamera.mPosition;
+    glm::vec3 fogCenter = program.activeCamera->mPosition;
     setUniform3f("fogCenter", fogCenter);
 }
 
@@ -199,7 +195,7 @@ void drawLights(const glm::vec3 & lightPos, const glm::vec3 * pointLightPosition
     // directional light
     renderDirectionalLight("dirLight",
                            {-0.2f, -1.0f, -0.3f},
-                           {0.06f, 0.06f, 0.06f},
+                           {0.3f, 0.3f, 0.3f},
                            {0.4f, 0.4f, 0.4f},
                            {0.5f, 0.5f, 0.5f});
 
@@ -210,8 +206,8 @@ void drawLights(const glm::vec3 & lightPos, const glm::vec3 * pointLightPosition
         renderPointLight(destination.c_str(),
                          pointLightPositions[i],
                          {0.05f, 0.05f, 0.05f},
-                         {0.8f, 0.8f, 0.8f},
-                         {1.0f, 1.0f, 1.0f},
+                         {0.4f, 0.4f, 0.4f},
+                         {0.7f, 0.7f, 0.7f},
                          1.0f,
                          0.09f,
                          0.032f);
@@ -226,10 +222,10 @@ void drawLights(const glm::vec3 & lightPos, const glm::vec3 * pointLightPosition
                      0.14f,
                      0.07f);
 
-    // spot light
+    // spotlight
     renderSpotlight("spotlight",
-                    program.activeCamera.mPosition,
-                    program.activeCamera.mFront,
+                    program.activeCamera->mPosition,
+                    program.activeCamera->mFront,
                     {0.0f, 0.0f, 0.0f},
                     {1.0f, 1.0f, 1.0f},
                     {1.0f, 1.0f, 1.0f},
@@ -281,27 +277,68 @@ void drawSkybox(Skybox & skybox) {
     glDepthMask(GL_FALSE);
     setActiveProgram(gl::skyboxId);
     glm::mat4 proj = Render::projection();
-    glm::mat4 view = glm::mat4(glm::mat3(program.activeCamera.getViewMatrix()));
+    glm::mat4 view = glm::mat4(glm::mat3(program.activeCamera->getViewMatrix()));
     setUniformMat4("projection", proj);
     setUniformMat4("view", view);
-    setUniform1i("clouds", skybox.cloudsTexture);
-//    setUniform2f("CloudCoords", 0.0f, 1.0f);
+
     glBindVertexArray(skybox.VAO);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.texture);
-//    glActiveTexture(GL_TEXTURE6);
-//    glBindTexture(GL_TEXTURE_2D,  skybox.cloudsTexture);
+
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
 }
 
 void drawBackpack(Model & backpack) {
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = program.activeCamera->getViewMatrix();
+    glm::mat4 proj = Render::projection();
+    model = glm::translate(model, glm::vec3(-13.5f, -5.0f, -11.5f));
+//    model = glm::rotate(model, glm::radians(-170.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+    glm::mat4 PVM = proj * view * model;
+    setUniformMat4("model", model);
+    setUniformMat4("PVM", PVM);
+    backpack.draw(gl::programId);
+}
 
+void drawTrees(Model & tree) {
+    glm::vec3 treePositions[] = {
+            {-5.0f, 4.7f, -5.0f},
+            {-5.0f, 4.7f, 7.0f},
+            {7.0f, 4.7f, 6.8f},
+            {11.0f, 4.7f, -13.0f},
+            {9.3f, 4.7f, -8.3f}
+    };
+
+    float treeRotations[] = {
+            0.0f,
+            35.0f,
+            13.0f,
+            123.0f,
+            86.0f
+    };
+
+    glm::mat4 proj, view, model, PVM;
+    proj = Render::projection();
+    view = program.activeCamera->getViewMatrix();
+    for (int i = 0; i != 5; ++i) {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, treePositions[i]);
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(treeRotations[i]), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::scale(model, glm::vec3(0.05f, 0.05f, 0.05f));
+        PVM = proj * view * model;
+//    setUniform1f("materials[0].shininess", 4.0f);
+        setUniformMat4("model", model);
+        setUniformMat4("PVM", PVM);
+        tree.draw(gl::programId);
+    }
 }
 
 void drawTower(Model & tower) {
     glm::mat4 proj, view, model, PVM;
     proj = Render::projection();
-    view = program.activeCamera.getViewMatrix();
+    view = program.activeCamera->getViewMatrix();
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(-15.0f, 2.0f, -15.0f));
     model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -394,7 +431,6 @@ void drawFire(Image & fire, const glm::mat4 & view, const glm::mat4 & proj) {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     gl::fireTime += gl::deltaTime;
-    // gl::fireTime += 0.1f;
 
     glDisable(GL_BLEND);
 }
@@ -402,9 +438,9 @@ void drawFire(Image & fire, const glm::mat4 & view, const glm::mat4 & proj) {
 void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time) {
     glm::mat4 proj, view, model, PVM;
     proj = Render::projection();
-    view = program.activeCamera.getViewMatrix();
+    view = program.activeCamera->getViewMatrix();
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(5.0f, -5.3f, 10.0f));
+    model = glm::translate(model, glm::vec3(-5.0f, -5.3f, -10.0f));
     if (gl::swordClicked) {
         model = glm::rotate(model,
                             (float) glm::radians(sin(time) * 360.0f),
@@ -412,7 +448,7 @@ void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time) {
     }
     model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
     PVM = proj * view * model;
-//    setUniform1f("materials[0].shininess", 4.0f);
+
     setUniformMat4("model", model);
     setUniformMat4("PVM", PVM);
     glActiveTexture(GL_TEXTURE0);
@@ -428,7 +464,7 @@ void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time) {
 void drawFireplace(Model & fireplace, GLuint diff, GLuint spec) {
     glm::mat4 proj, view, model, PVM;
     proj = Render::projection();
-    view = program.activeCamera.getViewMatrix();
+    view = program.activeCamera->getViewMatrix();
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(-12.0f, -5.3f, -10.0f));
     model = glm::rotate(model,
@@ -436,8 +472,8 @@ void drawFireplace(Model & fireplace, GLuint diff, GLuint spec) {
                         glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
     PVM = proj * view * model;
-//    setUniform1f("materials[0].shininess", 4.0f);
-    setUniform1f("materials[0].shininess", 1.0f);
+
+    setUniform1f("materials[0].shininess", 16.0f);
     setUniformMat4("model", model);
     setUniformMat4("PVM", PVM);
     glActiveTexture(GL_TEXTURE0);
@@ -448,4 +484,30 @@ void drawFireplace(Model & fireplace, GLuint diff, GLuint spec) {
 
     // object picking
     drawPickBuffer(proj, view, model, fireplace, gl::fireplaceId);
+}
+
+void drawSeagull(Model & gull) {
+    glm::mat4 proj, view, model, PVM;
+    proj = Render::projection();
+    view = program.activeCamera->getViewMatrix();
+    model = glm::mat4(1.0f);
+    glm::vec3 position = glm::vec3(-15.0f, 14.0f, -15.0f);
+    static float angle = -70.0f;
+    angle += 65.0f * gl::deltaTime;
+    position.x += sin(glfwGetTime()) * 4.0f;
+    position.z += cos(glfwGetTime()) * 4.0f;
+    program.dynamicCamera.mPosition = position;
+    program.dynamicCamera.mPosition.y += 3.0f;
+    program.dynamicCamera.mYaw += 65.0f * gl::deltaTime;
+    program.dynamicCamera.updateCameraVectors();
+    model = glm::translate(model, position);
+    model = glm::rotate(model,
+                        glm::radians(angle),
+                        glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+    PVM = proj * view * model;
+
+    setUniformMat4("model", model);
+    setUniformMat4("PVM", PVM);
+    gull.draw(gl::programId);
 }

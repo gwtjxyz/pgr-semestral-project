@@ -34,9 +34,10 @@ public:
     // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void processMouseScroll(float yOffset);
 
-private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors();
+private:
+
 
 public:
     // camera Attributes
@@ -53,4 +54,5 @@ public:
     float mMouseSensitivity;
     float mZoom;
     bool mIsSprinting;
+    bool mStatic;
 };

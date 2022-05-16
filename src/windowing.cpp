@@ -63,7 +63,29 @@ bool init() {
 
     // create and set active camera
     Camera mainCamera(glm::vec3(0.0f, 0.0f, 3.0f));
-    program.activeCamera = mainCamera;
+    program.mainCamera = mainCamera;
+    program.activeCamera = &program.mainCamera;
+    // static cameras
+    Camera static1(Config::STATIC_CAMERA_POS_1,
+                   {0.0f, 1.0f, 0.0f},
+                   Config::STATIC_CAMERA_YAW_1,
+                   Config::STATIC_CAMERA_PITCH_1);
+    static1.mStatic = true;
+    program.staticCamera1 = static1;
+
+    Camera static2(Config::STATIC_CAMERA_POS_2,
+                   {0.0f, 1.0f, 0.0f},
+                   Config::STATIC_CAMERA_YAW_2,
+                   Config::STATIC_CAMERA_PITCH_2);
+    static2.mStatic = true;
+    program.staticCamera2 = static2;
+
+    Camera dynamic({-15.0f, 14.0f, -15.0f},
+                   {0.0f, 1.0f, 0.0f},
+                   Config::YAW,
+                   -30.0f);
+    dynamic.mStatic = true;
+    program.dynamicCamera = dynamic;
 
     glEnable(GL_DEPTH_TEST);
 
@@ -85,13 +107,13 @@ void processInput(GLFWwindow * window) {
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        program.activeCamera.processKeyboard(CameraDirections::FORWARD, gl::deltaTime);
+        program.activeCamera->processKeyboard(CameraDirections::FORWARD, gl::deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        program.activeCamera.processKeyboard(CameraDirections::BACKWARD, gl::deltaTime);
+        program.activeCamera->processKeyboard(CameraDirections::BACKWARD, gl::deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        program.activeCamera.processKeyboard(CameraDirections::LEFT, gl::deltaTime);
+        program.activeCamera->processKeyboard(CameraDirections::LEFT, gl::deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        program.activeCamera.processKeyboard(CameraDirections::RIGHT, gl::deltaTime);
+        program.activeCamera->processKeyboard(CameraDirections::RIGHT, gl::deltaTime);
 
     switchResolutions();
 }
@@ -136,18 +158,18 @@ void mouseCallback(GLFWwindow * window, double xPosIn, double yPosIn) {
     gl::lastX = xPos;
     gl::lastY = yPos;
 
-    program.activeCamera.processMouseMovement(xOffset, yOffset);
+    program.activeCamera->processMouseMovement(xOffset, yOffset);
 }
 
 void scrollCallback(GLFWwindow * window, double xOffset, double yOffset) {
-    program.activeCamera.processMouseScroll((float) yOffset);
+    program.activeCamera->processMouseScroll((float) yOffset);
 }
 
 void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, int mods) {
     if (mods & GLFW_MOD_SHIFT)
-        program.activeCamera.mIsSprinting = true;
+        program.activeCamera->mIsSprinting = true;
     else
-        program.activeCamera.mIsSprinting = false;
+        program.activeCamera->mIsSprinting = false;
 
     if (mods & GLFW_MOD_ALT)
         glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -164,6 +186,15 @@ void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, in
         if (gl::logoEnabled)
             gl::logoTime = 0.0f;    // reset every time we turn it on
     }
+
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+        program.activeCamera = &program.mainCamera;
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+        program.activeCamera = &program.staticCamera1;
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS)
+        program.activeCamera = &program.staticCamera2;
+    if (key == GLFW_KEY_4 && action == GLFW_PRESS)
+        program.activeCamera = &program.dynamicCamera;
 }
 
 void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods) {
