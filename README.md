@@ -1,6 +1,6 @@
 # pgr-semestral-project
 Repo for my semestral project for my university's OpenGL graphics course. I tried to code in as much of a "C-style" 
-as possible - meaning I avoided unnecessary classes or STL usage as much as I could, which is not to say that I didn't use them unnecessarily.
+as possible - meaning I avoided unnecessary classes or STL usage as much as I could, which is not to say that I completely succeeded of course.
 If I had a bit more time then I'd cut down on what little of it I do use for sure (and maybe I will at some point in the future).
 I also tried to **not** make a game engine, as my philosophy generally speaking is to just make whatever is the most obvious thing to make
 before the need for something more complex arises. I figured I wouldn't need an entity component system, crazy inheritance or model hot-loading
