@@ -1,12 +1,21 @@
 #pragma once
-
+//----------------------------------------------------------------------------------------
+/**
+ * \file       windowing.h
+ * \author     Yury Udavichenka
+ * \date       18/04/2022
+ * \brief      Window handling
+ *
+ * Contains code for setting up the initial window context,
+ * GUI, as well as processing input and various callbacks related to it.
+ *
+*/
+//----------------------------------------------------------------------------------------
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include "camera.h"
 
-// TODO add fancy description
-// TODO rename this file, this name is horrible
-
+/// sets up everything
 bool init();
 
 void framebufferSizeCallback(GLFWwindow * window, int width, int height);

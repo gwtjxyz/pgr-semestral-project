@@ -435,7 +435,7 @@ void drawFire(Image & fire, const glm::mat4 & view, const glm::mat4 & proj) {
     glDisable(GL_BLEND);
 }
 
-void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time) {
+void drawSword(Model & sword, GLuint diff, GLuint spec) {
     glm::mat4 proj, view, model, PVM;
     proj = Render::projection();
     view = program.activeCamera->getViewMatrix();
@@ -443,7 +443,7 @@ void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time) {
     model = glm::translate(model, glm::vec3(-5.0f, -5.3f, -10.0f));
     if (gl::swordClicked) {
         model = glm::rotate(model,
-                            (float) glm::radians(sin(time) * 360.0f),
+                            (float) glm::radians(sin(gl::lastFrame) * 360.0f),
                             glm::vec3(0.0f, 1.0f, 0.0f));
     }
     model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));

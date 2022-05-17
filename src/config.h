@@ -1,5 +1,17 @@
 #pragma once
-
+//----------------------------------------------------------------------------------------
+/**
+ * \file       config.h
+ * \author     Yury Udavichenka
+ * \date       30/04/2022
+ * \brief      Configuration and globals header file
+ *
+ *  Header containing global constants that (generally speaking) don't change
+ *  as well as certain global variables that can (and do) change over the
+ *  course of the application's runtime.
+ *
+*/
+//----------------------------------------------------------------------------------------
 #include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -10,20 +22,17 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
-// TODO add fancy description
-
-// namespace storing pre-defined configuration constants
-// this generally doesn't change during the program's run
-// unless directly requested by the user
-// TODO add this to options menu or something
+/// namespace storing pre-defined configuration constants\n
+/// this generally doesn't change during the program's run\n
+/// unless directly requested by the user
 namespace Config {
-    extern int WINDOW_WIDTH ;
+    extern int WINDOW_WIDTH;
     extern int WINDOW_HEIGHT;
 
-    extern bool ENABLE_DEBUG;
-    extern bool ENABLE_FULLSCREEN;
+    extern bool ENABLE_DEBUG;       ///< Debug parameter - currently used for drawing wireframes
+    extern bool ENABLE_FULLSCREEN;  ///< UNUSED
 
-    extern float FOV;          // vertical FOV - equal to 90° horizontal FOV
+    extern float FOV;          ///< vertical FOV - equal to approx. 90° horizontal FOV
     extern float ZNEAR;
     extern float ZFAR;
 
@@ -36,10 +45,10 @@ namespace Config {
     const float SCENE_BOUNDS = 50.0f;
 
     // Perlin noise - for terrain generation
-    const float Z_CONSTANT = 0.8f;
-    const int NOISE_INTENSITY = 10;
-    const float Y_BOTTOM = -4.0f;               // lowest possible y - at result 0
-    const float Y_RANGE = 8.0f;                 // should be -2 * Y_BOTTOM
+    const float Z_CONSTANT = 0.8f;              ///< Constant value for noise generator's Z input
+    const int NOISE_INTENSITY = 10;             ///< Constant specifying noise intensity - the higher the value, the bumpier the resulting terrain
+    const float Y_BOTTOM = -4.0f;               ///< Constant specifying minimum generated height - UNUSED
+    const float Y_RANGE = 8.0f;                 ///< Constant specifying range of generated heights - UNUSED
 
     // terrain
     const int TERRAIN_SIZE = 512;
@@ -62,33 +71,32 @@ namespace Config {
     const float STATIC_CAMERA_PITCH_2 = -15.7f;
 }
 
-// namespace storing rendering-related variables
-// this changes dynamically during the program's execution
+/// namespace storing rendering-related variables\n
+/// this changes dynamically during the program's execution
 namespace gl {
-    extern nanogui::Screen * screen;
-    extern nanogui::FormHelper * gui;
-    extern bool guiEnabled;
-    extern GLuint pickFBO;
-    extern GLuint programId;
-    extern GLuint lightingId;
-    extern GLuint skyboxId;
-    extern GLuint logoId;
-    extern GLuint pickObjectId;
-    extern GLuint fireId;
-    extern GLFWwindow * mainWindow;
-    extern float deltaTime;
-    extern float lastFrame;
-    extern bool firstMouse;
-    extern float lastX;
-    extern float lastY;
-    extern bool logoEnabled;
-    extern float logoTime;
-    extern float fireTime;
-    extern bool enableMovement;
+    extern nanogui::Screen * screen;                ///< Nanogui screen variable
+    extern nanogui::FormHelper * gui;               ///< Nanogui GUI container
+    extern bool guiEnabled;                         ///< controls whether or not to draw the GUI
+    extern GLuint pickFBO;                          ///< Picking framebuffer object
+    extern GLuint programId;                        ///< Main shader program
+    extern GLuint lightingId;                       ///< Lighting cube shader program
+    extern GLuint skyboxId;                         ///< Skybox shader program
+    extern GLuint logoId;                           ///< OpenGL logo shader program
+    extern GLuint pickObjectId;                     ///< Pick object shader program
+    extern GLuint fireId;                           ///< Fire animation texture program
+    extern GLFWwindow * mainWindow;                 ///< GLFW window
+    extern float deltaTime;                         ///< Time delta
+    extern float lastFrame;                         ///< Last frame timestamp
+    extern bool firstMouse;                         ///< Whether or not the mouse input was the first yet - for camera
+    extern float lastX;                             ///< Mouse's last X pos
+    extern float lastY;                             ///< Mouse's last Y pos
+    extern bool logoEnabled;                        ///< Controls OpenGL logo drawing
+    extern float logoTime;                          ///< Controls OpenGL logo scrolling
+    extern float fireTime;                          ///< Controls fire texture animation
     // pick object IDs
-    extern int swordId;
-    extern int towerId;
-    extern int fireplaceId;
+    extern int swordId;                             ///< Sword pick object ID
+    extern int towerId;                             ///< Tower pick object ID
+    extern int fireplaceId;                         ///< Fireplace pick object ID
     // pick object states
     extern bool swordClicked;
     extern bool towerClicked;

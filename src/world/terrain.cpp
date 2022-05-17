@@ -105,8 +105,8 @@ double Perlin::grad(int hash, double x, double y, double z) {
     return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 }
 
-// helper function for mesh generation
-// could be optimized to be better/faster/more efficient
+/// helper function for mesh generation\n
+/// could be optimized to be better/faster/more efficient
 glm::vec3 calculateNormals(int i, int j, int size, float **& mesh) {
     int stride = 8;
     glm::vec3 result = glm::vec3(0.0f);

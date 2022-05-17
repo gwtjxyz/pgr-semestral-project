@@ -6,7 +6,8 @@
  * \date       18/04/2022
  * \brief      render functions header
  *
- *  Contains several OpenGL rendering-related classes and functions
+ *  Contains several OpenGL rendering-related classes and functions.
+ *
  *
 */
 //----------------------------------------------------------------------------------------
@@ -62,6 +63,9 @@ void renderSpotlight(const char * varName,
                      float cutoff,
                      float outerCutoff);
 
+///
+/// Helper function for clearing the custom framebuffer we use for object picking
+///
 void clearPickFramebuffer();
 
 void drawCrates(const glm::mat4 & proj, const glm::mat4 & view, Object & cube);
@@ -89,7 +93,7 @@ void drawLogo(Image & logo, const glm::mat4 & view, const glm::mat4 & proj);
 
 void drawFire(Image & fire, const glm::mat4 & view, const glm::mat4 & proj);
 
-void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time);
+void drawSword(Model & sword, GLuint diff, GLuint spec);
 
 void drawFireplace(Model & fireplace, GLuint diff, GLuint spec);
 

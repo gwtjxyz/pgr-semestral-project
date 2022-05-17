@@ -4,7 +4,18 @@
 
 
 #include "common.h"
-
+//----------------------------------------------------------------------------------------
+/**
+ * \file       imported_mesh.h
+ * \author     Yury Udavichenka
+ * \date       01/05/2022
+ * \brief      Mesh generator
+ *
+ * Generates meshes based on input from the model.h class. This is code mostly grabbed
+ * from learnopengl.com with slight adjustments to allow for pick FBO generation.
+ *
+*/
+//----------------------------------------------------------------------------------------
 class ImportedMesh {
 public:
     ImportedMesh(std::vector<Vertex> vetices,

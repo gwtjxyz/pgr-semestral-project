@@ -63,7 +63,6 @@ bool init() {
     gl::logoId = glCreateProgram();
     gl::pickObjectId = glCreateProgram();
     gl::fireId = glCreateProgram();
-//    setActiveProgram(gl::programId);
 
     // create and set active camera
     Camera mainCamera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -156,6 +155,8 @@ void switchResolutions() {
 //    if ()
 }
 
+/// For processing repeating input - hence why movement is in here instead of the other callback
+/// @param[in] window       GLFW window pointer
 void processInput(GLFWwindow * window) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         program.activeCamera->processKeyboard(CameraDirections::FORWARD, gl::deltaTime);
@@ -261,12 +262,7 @@ void keyboardCallback(GLFWwindow * window, int key, int scancode, int action, in
 void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && !gl::guiEnabled) {
         glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-//        pickObject(button);
-        program.isClickHeldDown = true;
         pickObject(button);
-    }
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-        program.isClickHeldDown = false;
     }
     gl::screen->mouseButtonCallbackEvent(button, action, mods);
 }
@@ -280,7 +276,7 @@ void setCallbacks() {
     // tell GLFW to capture our mouse
     glfwSetInputMode(gl::mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
-
+/// see https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDebugMessageCallback.xhtml
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity,
                             GLsizei length, const char * message, const void * userParam) {
     // ignore non-significant error/warning codes

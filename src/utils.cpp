@@ -173,7 +173,7 @@ GLuint loadTexture2D(const char * path, GLenum format) {
     return texture;
 }
 
-GLuint loadTextureFromFile(const char * path, const std::string & directory, bool gamma) {
+GLuint loadTextureFromFile(const char * path, const std::string & directory) {
     std::string filename = std::string(path);
     filename = directory + '/' + filename;
 
@@ -212,17 +212,6 @@ GLuint loadCubemap(std::vector<std::string> faces) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     return textureId;
-}
-
-// TODO stop being lazy and fill this up
-void loadMaterials() {
-    Material emerald {
-            {0.0215, 0.1745, 0.0215},
-            {0.07568, 0.61424, 0.07568},
-            {0.633, 0.727811, 0.633},
-            0.6
-    };
-//    gl::materials.emplace(MaterialType::EMERALD, emerald);
 }
 
 void setupFramebuffer() {

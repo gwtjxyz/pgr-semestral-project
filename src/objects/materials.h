@@ -5,6 +5,7 @@
 #include "common.h"
 
 // TODO figure out what to do with this
+/// Completely unused
 enum class MaterialType : int {
     EMERALD = 0,
     JADE,

@@ -1,14 +1,3 @@
-//----------------------------------------------------------------------------------------
-/**
- * \file       camera.cpp
- * \author     Yury Udavichenka
- * \date       30/04/2022
- * \brief      A brief file description
- *
- *  A more detailed file description.
- *
-*/
-//----------------------------------------------------------------------------------------
 #include "camera.h"
 #include <glm/detail/type_quat.hpp>
 #include <iostream>
@@ -97,7 +86,6 @@ void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constr
     xOffset *= mMouseSensitivity;
     yOffset *= mMouseSensitivity;
 
-//    mYaw = glm::mod(mYaw + (float) xOffset, 360.0f);
     mYaw   += xOffset;
     mPitch += yOffset;
 
@@ -127,7 +115,7 @@ void Camera::updateCameraVectors() {
     front.y = sin(glm::radians(mPitch));
     front.z = sin(glm::radians(mYaw)) * cos(glm::radians(mPitch));
     mFront = glm::normalize(front);
-//    // recalculate right and up vectors
+    // recalculate right and up vectors
     mRight = glm::normalize(glm::cross(mFront, mWorldUp));
     mUp    = glm::normalize(glm::cross(mRight, mFront));
 }

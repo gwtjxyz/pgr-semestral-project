@@ -144,7 +144,7 @@ int main() {
         drawBackpack(backpackModel);
         drawTrees(treeModel);
         drawTower(towerModel);
-        drawSword(swordModel, swordDiff, swordSpec, gl::lastFrame);
+        drawSword(swordModel, swordDiff, swordSpec);
         drawFireplace(fireplaceModel, fireplaceDiff, fireplaceSpec);
         drawBird(birdModel);
         drawStele(steleModel, steleDiff, steleSpec);

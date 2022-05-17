@@ -18,7 +18,7 @@ namespace Config {
     int WINDOW_HEIGHT = 600;
     bool ENABLE_DEBUG = false;
     bool ENABLE_FULLSCREEN = false;
-    float FOV = 59.0f;          // vertical FOV - equal to 90° horizontal FOV
+    float FOV = 59.0f;
     float ZNEAR = 0.1f;
     float ZFAR = 100.0f;
 
@@ -45,7 +45,6 @@ namespace gl {
     bool logoEnabled = false;
     float logoTime = 0.0f;
     float fireTime = 0.0f;
-    bool enableMovement = true;
     // pick object IDs
     int swordId = 1;
     int towerId = 2;
