@@ -44,12 +44,11 @@ int main() {
 
     Model backpackModel(R"(../resources/models/backpack/backpack.obj)");
 
+    stbi_set_flip_vertically_on_load(false);
     Model treeModel(R"(../resources/models/dead_tree/tree_.fbx)");
 
-    stbi_set_flip_vertically_on_load(false);
     GLuint steleDiff = loadTexture2D(R"(../resources/models/stone_stele/dif_transp.png)");
     GLuint steleSpec = loadTexture2D(R"(../resources/models/stone_stele/spec.png)");
-    stbi_set_flip_vertically_on_load(true);
     Model steleModel(R"(../resources/models/stone_stele/Stone_Stele.FBX)");
 
     Model towerModel(R"(../resources/models/tower/scene.gltf)");

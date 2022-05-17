@@ -139,9 +139,9 @@ void drawCrates(const glm::mat4 & proj, const glm::mat4 & view, Object & cube) {
             glm::vec3( 0.0f,  -5.0f,  0.0f),
             glm::vec3( 0.0f,  -4.0f, 0.0f),
             glm::vec3(-0.1f, -3.0f, -0.2f),
-            glm::vec3(-3.8f, -5.7f, -12.3f),
-            glm::vec3( 2.4f, -5.4f, -3.5f),
-            glm::vec3(-1.7f,  -4.0f, -7.5f),
+            glm::vec3(-0.1f, -2.0f, 0.1f),
+            glm::vec3( 0.0f, -1.0f, -0.0f),
+            glm::vec3(-1.7f,  -5.0f, -7.5f),
             glm::vec3( -3.3f, -5.0f, -2.5f),
             glm::vec3( 1.5f,  -5.0f, -2.5f),
             glm::vec3( 2.5f,  -5.2f, -1.5f),
@@ -161,7 +161,8 @@ void drawCrates(const glm::mat4 & proj, const glm::mat4 & view, Object & cube) {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, cubePositions[i]);
         float angle = 20.0f * (float) i;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        if (i > 5)
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
         glm::mat4 PVM = proj * view * model;
         setUniformMat4("PVM", PVM);
