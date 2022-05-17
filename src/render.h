@@ -64,7 +64,7 @@ void renderSpotlight(const char * varName,
 
 void clearPickFramebuffer();
 
-void drawTenCubes(const glm::mat4 & proj, const glm::mat4 & view, Object & cube);
+void drawCrates(const glm::mat4 & proj, const glm::mat4 & view, Object & cube);
 
 void drawLightCube(const glm::vec3 & lightPos,
                    const glm::mat4 & proj,
@@ -93,4 +93,10 @@ void drawSword(Model & sword, GLuint diff, GLuint spec, const float & time);
 
 void drawFireplace(Model & fireplace, GLuint diff, GLuint spec);
 
-void drawSeagull(Model & gull);
+void drawBird(Model & gull);
+
+void drawStele(Model & stele, GLuint diff, GLuint spec);
+
+void drawLavaRock(Model & lavaRock, GLuint diff, GLuint spec);
+
+void drawBarrel(Model & barrel, GLuint diff, GLuint spec);

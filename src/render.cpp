@@ -134,18 +134,18 @@ void drawPickBuffer(const glm::mat4 & proj, const glm::mat4 & view, const glm::m
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void drawTenCubes(const glm::mat4 & proj, const glm::mat4 & view, Object & cube) {
+void drawCrates(const glm::mat4 & proj, const glm::mat4 & view, Object & cube) {
     glm::vec3 cubePositions[] = {
-            glm::vec3( 0.0f,  0.0f,  0.0f),
-            glm::vec3( 2.0f,  5.0f, -15.0f),
-            glm::vec3(-1.5f, -2.2f, -2.5f),
-            glm::vec3(-3.8f, -2.0f, -12.3f),
-            glm::vec3( 2.4f, -0.4f, -3.5f),
-            glm::vec3(-1.7f,  3.0f, -7.5f),
-            glm::vec3( 1.3f, -2.0f, -2.5f),
-            glm::vec3( 1.5f,  2.0f, -2.5f),
-            glm::vec3( 1.5f,  0.2f, -1.5f),
-            glm::vec3(-1.3f,  1.0f, -1.5f)
+            glm::vec3( 0.0f,  -5.0f,  0.0f),
+            glm::vec3( 0.0f,  -4.0f, 0.0f),
+            glm::vec3(-0.1f, -3.0f, -0.2f),
+            glm::vec3(-3.8f, -5.7f, -12.3f),
+            glm::vec3( 2.4f, -5.4f, -3.5f),
+            glm::vec3(-1.7f,  -4.0f, -7.5f),
+            glm::vec3( -3.3f, -5.0f, -2.5f),
+            glm::vec3( 1.5f,  -5.0f, -2.5f),
+            glm::vec3( 2.5f,  -5.2f, -1.5f),
+            glm::vec3(-2.3f,  -5.0f, -3.5f)
     };
 
     setUniform1f("materials[0].shininess", 32.0f);
@@ -486,7 +486,7 @@ void drawFireplace(Model & fireplace, GLuint diff, GLuint spec) {
     drawPickBuffer(proj, view, model, fireplace, gl::fireplaceId);
 }
 
-void drawSeagull(Model & gull) {
+void drawBird(Model & gull) {
     glm::mat4 proj, view, model, PVM;
     proj = Render::projection();
     view = program.activeCamera->getViewMatrix();
@@ -510,4 +510,60 @@ void drawSeagull(Model & gull) {
     setUniformMat4("model", model);
     setUniformMat4("PVM", PVM);
     gull.draw(gl::programId);
+}
+
+void drawStele(Model & stele, GLuint diff, GLuint spec) {
+    glm::mat4 proj, view, model, PVM;
+    proj = Render::projection();
+    view = program.activeCamera->getViewMatrix();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-8.0f, -7.0f, 2.0f));
+    model = glm::rotate(model,
+                        glm::radians(-90.0f),
+                        glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.025f, 0.025f, 0.025f));
+    PVM = proj * view * model;
+
+    setUniform1f("materials[0].shininess", 16.0f);
+    setUniformMat4("model", model);
+    setUniformMat4("PVM", PVM);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diff);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, spec);
+    stele.draw(gl::programId);
+}
+
+void drawLavaRock(Model & lavaRock, GLuint diff, GLuint spec) {
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = program.activeCamera->getViewMatrix();
+    glm::mat4 proj = Render::projection();
+    model = glm::translate(model, glm::vec3(-3.5f, -4.5f, -26.5f));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+    glm::mat4 PVM = proj * view * model;
+    setUniformMat4("model", model);
+    setUniformMat4("PVM", PVM);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diff);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, spec);
+    lavaRock.draw(gl::programId);
+}
+
+void drawBarrel(Model & barrel, GLuint diff, GLuint spec) {
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = program.activeCamera->getViewMatrix();
+    glm::mat4 proj = Render::projection();
+    model = glm::translate(model, glm::vec3(-15.5f, -4.0f, -21.5f));
+//    model = glm::rotate(model, glm::radians(-170.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+    glm::mat4 PVM = proj * view * model;
+    setUniformMat4("model", model);
+    setUniformMat4("PVM", PVM);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diff);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, spec);
+    barrel.draw(gl::programId);
 }

@@ -46,17 +46,33 @@ int main() {
 
     Model treeModel(R"(../resources/models/dead_tree/tree_.fbx)");
 
+    stbi_set_flip_vertically_on_load(false);
+    GLuint steleDiff = loadTexture2D(R"(../resources/models/stone_stele/dif_transp.png)");
+    GLuint steleSpec = loadTexture2D(R"(../resources/models/stone_stele/spec.png)");
+    stbi_set_flip_vertically_on_load(true);
+    Model steleModel(R"(../resources/models/stone_stele/Stone_Stele.FBX)");
+
     Model towerModel(R"(../resources/models/tower/scene.gltf)");
     // do this because this model's textures are broken otherwise
     GLuint swordDiff = loadTexture2D(R"(../resources/models/sword/shortsword_Shortsword_Diffuse.png)");
     GLuint swordSpec = loadTexture2D(R"(../resources/models/sword/shortsword_Shortsword_Reflection.png)");
     Model swordModel(R"(../resources/models/sword/shortsword.obj)");
     // same here
+    stbi_set_flip_vertically_on_load(false);
     GLuint fireplaceDiff = loadTexture2D(R"(../resources/models/fireplace/ohniste4UVcomplet1.png)");
     GLuint fireplaceSpec = loadTexture2D(R"(../resources/models/fireplace/ohniste4UVcomplet1spec.png)");
+    stbi_set_flip_vertically_on_load(true);
     Model fireplaceModel(R"(../resources/models/fireplace/fireplace.3ds)");
 
-    Model gullModel(R"(../resources/models/bird/bird static.fbx)");
+    Model birdModel(R"(../resources/models/bird/bird static.fbx)");
+
+    GLuint lavaRockDiff = loadTexture2D(R"(../resources/models/lava_rock/Rock_1_Emissive.jpg)");
+    GLuint lavaRockSpec = loadTexture2D(R"(../resources/models/lava_rock/Rock_1_Specular.jpg)");
+    Model lavaRockModel(R"(../resources/models/lava_rock/Rock_1.OBJ)");
+
+    GLuint barrelDiff = loadTexture2D(R"(../resources/models/barrel/Deffuse.png)");
+    GLuint barrelSpec = loadTexture2D(R"(../resources/models/barrel/Barrel_AO.png)");
+    Model barrelModel(R"(../resources/models/barrel/Wood Barrel.obj)");
 
     Terrain terrain = createTerrain(Config::TERRAIN_SIZE, Config::TERRAIN_TEXTURE_STEP);
 
@@ -124,13 +140,16 @@ int main() {
 
         drawFog();
         drawLights(lightPos, pointLightPositions);
-        drawTenCubes(proj, view, cubes);
+        drawCrates(proj, view, cubes);
         drawBackpack(backpackModel);
         drawTrees(treeModel);
         drawTower(towerModel);
         drawSword(swordModel, swordDiff, swordSpec, gl::lastFrame);
         drawFireplace(fireplaceModel, fireplaceDiff, fireplaceSpec);
-        drawSeagull(gullModel);
+        drawBird(birdModel);
+        drawStele(steleModel, steleDiff, steleSpec);
+        drawLavaRock(lavaRockModel, lavaRockDiff, lavaRockSpec);
+        drawBarrel(barrelModel, barrelDiff, barrelSpec);
 
         // terrain
         drawTerrain(terrain, proj, view);
